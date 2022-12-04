@@ -27,8 +27,7 @@ export default function day1(target)
         .slice(0, 3)
         .reduce((a, v) => a + v, 0);
 
-      console.log({ part1, part2 });
-
+      console.log('day1:', { part1, part2 });
     })
     .catch(err => console.log(err));
 }
