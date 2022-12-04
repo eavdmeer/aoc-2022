@@ -1,10 +1,13 @@
 import * as fs from 'node:fs/promises';
 
-const input = process.argv[2] || 'data.txt';
-
-export default function day1()
+if (process.argv[2])
 {
-  fs.readFile(input)
+  day1(process.argv[2] || 'data.txt');
+}
+
+export default function day1(target)
+{
+  fs.readFile(target)
     .then(content =>
     {
       const totals = content
@@ -16,15 +19,15 @@ export default function day1()
           .reduce((a, w) => a + parseInt(w, 10), 0)
         );
 
-      const max = Math.max(...totals);
-      console.log(totals.indexOf(max) + 1, max);
+      const part1 = Math.max(...totals);
 
-      const top3 = totals
+      const part2 = totals
         .sort()
         .reverse()
         .slice(0, 3)
         .reduce((a, v) => a + v, 0);
-      console.log(top3);
+
+      console.log({ part1, part2 });
 
     })
     .catch(err => console.log(err));
