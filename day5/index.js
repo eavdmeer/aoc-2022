@@ -2,7 +2,8 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day4(process.argv[2] || 'data.txt');
+  day4(process.argv[2])
+    .then(console.log);
 }
 
 export default async function day4(target)
@@ -53,17 +54,29 @@ export default async function day4(target)
     .map(v => v.match(/^move (\d+) from (\d+) to (\d+)$/))
     .map(m => ({ from: m[2], to: m[3], count: m[1] }));
 
+  const part1 = JSON.parse(JSON.stringify(stacks));
   moves.forEach(m =>
   {
     for (let i = 0; i < m.count; i++)
     {
-      stacks[m.to].push(stacks[m.from].pop());
+      part1[m.to].push(part1[m.from].pop());
     }
   });
 
-  const part1 = Object.values(stacks).map(v => v.pop()).join('');
+  const part2 = JSON.parse(JSON.stringify(stacks));
+  moves.forEach(m =>
+  {
+    const popped = [];
+    for (let i = 0; i < m.count; i++)
+    {
+      popped.unshift(part2[m.from].pop());
+    }
+    part2[m.to].push(...popped);
+  });
 
-  const part2 = '';
-
-  return { day: 5, part1, part2 };
+  return {
+    day: 5,
+    part1: Object.values(part1).map(v => v.pop()).join(''),
+    part2: Object.values(part2).map(v => v.pop()).join('')
+  };
 }
