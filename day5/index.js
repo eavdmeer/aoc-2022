@@ -57,8 +57,7 @@ export default async function day4(target)
   {
     for (let i = 0; i < m.count; i++)
     {
-      const popped = stacks[m.from].pop();
-      stacks[m.to].push(popped);
+      stacks[m.to].push(stacks[m.from].pop());
     }
   });
 
