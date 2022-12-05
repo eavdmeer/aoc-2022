@@ -68,12 +68,7 @@ export default async function day4(target)
   const part2 = JSON.parse(JSON.stringify(stacks));
   moves.forEach(m =>
   {
-    const popped = [];
-    for (let i = 0; i < m.count; i++)
-    {
-      popped.unshift(part2[m.from].pop());
-    }
-    part2[m.to].push(...popped);
+    part2[m.to].push(...part2[m.from].splice(-m.count));
   });
 
   return {
