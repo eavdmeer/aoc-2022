@@ -8,6 +8,8 @@ if (process.argv[2])
 
 export default async function day4(target)
 {
+  const start = Date.now();
+
   const content = await fs.readFile(target);
 
   // Split content on an empty line
@@ -77,6 +79,7 @@ export default async function day4(target)
   return {
     day: 5,
     part1: Object.values(part1).map(v => v.pop()).join(''),
-    part2: Object.values(part2).map(v => v.pop()).join('')
+    part2: Object.values(part2).map(v => v.pop()).join(''),
+    duration: Date.now() - start
   };
 }
