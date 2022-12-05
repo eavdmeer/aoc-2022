@@ -1,0 +1,21 @@
+{
+  "name": "aoc-2022",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This small repo contains my NodeJS solutions to the Advent of Code challenge of 2022.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eavdmeer/aoc-2022.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eavdmeer/aoc-2022/issues"
+  },
+  "homepage": "https://github.com/eavdmeer/aoc-2022#readme"
+}
