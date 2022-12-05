@@ -21,7 +21,7 @@ export default async function day4(target)
     )
     .filter(([ l, r ]) =>
       l[0] >= r[0] && l[1] <= r[1] ||
-        r[0] >= l[0] && r[1] <= l[1]
+      r[0] >= l[0] && r[1] <= l[1]
     )
     .length;
 
