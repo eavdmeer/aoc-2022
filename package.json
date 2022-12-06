@@ -5,6 +5,7 @@
   "description": "This small repo contains my NodeJS solutions to the Advent of Code challenge of 2022.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
