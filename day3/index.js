@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day3(process.argv[2] || 'data.txt');
+  day3(process.argv[2]).then(console.log);
 }
 
 export default async function day3(target)

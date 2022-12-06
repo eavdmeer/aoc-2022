@@ -2,8 +2,7 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day4(process.argv[2])
-    .then(console.log);
+  day4(process.argv[2]).then(console.log);
 }
 
 export default async function day4(target)
