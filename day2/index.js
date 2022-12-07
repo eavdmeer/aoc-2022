@@ -7,6 +7,8 @@ if (process.argv[2])
 
 export default async function day2(target)
 {
+  const start = Date.now();
+
   const content = await fs.readFile(target);
   /*
         A: 'rock',        X: 'rock',
@@ -59,5 +61,5 @@ export default async function day2(target)
     .map(v => score[v])
     .reduce((a, v) => a + v, 0);
 
-  return { day: 2, part1, part2 };
+  return { day: 2, part1, part2, duration: Date.now() - start };
 }

@@ -7,6 +7,8 @@ if (process.argv[2])
 
 export default async function day1(target)
 {
+  const start = Date.now();
+
   const content = await fs.readFile(target);
 
   const totals = content
@@ -26,5 +28,5 @@ export default async function day1(target)
     .slice(0, 3)
     .reduce((a, v) => a + v, 0);
 
-  return { day: 1, part1, part2 };
+  return { day: 1, part1, part2, duration: Date.now() - start };
 }

@@ -7,6 +7,8 @@ if (process.argv[2])
 
 export default async function day4(target)
 {
+  const start = Date.now();
+
   const content = await fs.readFile(target);
   const part1 = content
     .toString()
@@ -42,5 +44,5 @@ export default async function day4(target)
         r[0] >= l[0] && r[0] <= l[1]
       )
       .length;
-  return { day: 4, part1, part2 };
+  return { day: 4, part1, part2, duration: Date.now() - start };
 }

@@ -20,4 +20,12 @@ async function getResults()
   return result.sort((a, b) => a.day - b.day);
 }
 
-getResults().then(console.log);
+const start = Date.now();
+
+getResults()
+  .then(res =>
+  {
+    console.log(res);
+    console.log(`Total duration: ${Date.now() - start}ms`);
+  });
+
