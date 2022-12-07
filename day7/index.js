@@ -17,12 +17,11 @@ export default async function day7(target)
   content
     .toString()
     .split(/\s*\n\s*/)
+    // Ignore enpty lines, dir and ls entries
     .filter(v => v && v !== '$ ls' && ! /^dir/.test(v))
     .forEach(line =>
     {
       const m = line.match(/^\$ cd (.*)$/);
-      const n = line.match(/^(\d+) (.*)$/);
-      const p = path.join('/').replace('//', '/');
       if (m)
       {
         if (m[1] === '..')
@@ -33,44 +32,37 @@ export default async function day7(target)
         {
           path.push(m[1]);
         }
+        return;
       }
-      else if (n)
+      const n = line.match(/^(\d+) (.*)$/);
+      if (n)
       {
-        sizes[p] = sizes[p] ? sizes[p] + parseInt(n[1], 10) :
-          parseInt(n[1], 10);
+        const size = parseInt(n[1], 10);
+        // Add size to this directory and all its parents
+        path.forEach((dir, i) =>
+        {
+          const p = path.slice(0, i + 1).join('/');
+          sizes[p] = sizes[p] ? sizes[p] + size : size;
+        });
       }
     });
-
-  const totalSizes = {};
-  Object.keys(sizes).forEach(s =>
-  {
-    totalSizes[s] = Object.keys(sizes)
-      .filter(k => k.startsWith(s))
-      .reduce((a, v) => a + sizes[v], 0);
-  });
 
   const limit = 100000;
 
-  const selected = Object.entries(totalSizes)
-    .filter(v => v[1] <= limit);
-
-  console.log('selected', selected);
-
-  const unique = selected
-    .filter((p, i, a) =>
-    {
-      console.log('check', p[0]);
-      console.log(! a.some(x => p[0].startsWith(`${x[0]}/`)));
-
-      return ! a.some(x => p[0].startsWith(`${x[0]}/`));
-    });
-
-  console.log('unique', unique);
-
-  const part1 = unique
+  const part1 = Object.entries(sizes)
+    .filter(v => v[1] <= limit)
     .reduce((a, v) => a + v[1], 0);
 
-  const part2 = '';
+  const diskSize = 70000000;
+  const required = 30000000;
+  const inUse = sizes['/'];
+  const toFree = required - (diskSize - inUse);
+
+  const part2 = Object.entries(sizes)
+    .sort((a, b) => a[1] - b[1])
+    .filter(v => v[1] >= toFree)
+    .shift()
+    .pop();
 
   return { day: 7, part1, part2, duration: Date.now() - start };
 }
