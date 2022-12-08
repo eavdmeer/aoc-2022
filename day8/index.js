@@ -54,57 +54,15 @@ function visible(x, y, grid)
 {
   const w = grid[0].length;
   const h = grid.length;
-
-  if (x === 0 || y === 0 || x === w - 1 || y === h - 1)
-  {
-    return true;
-  }
-
   const z = grid[y][x];
 
-  const votes = { left: true, right: true, up: true, down: true };
-
-  // Check right
-  for (let xi = x + 1; xi < w; xi++)
-  {
-    if (grid[y][xi] >= z)
-    {
-      votes.right = false;
-      break;
-    }
-  }
-
-  // Check left
-  for (let xi = 0; xi < x; xi++)
-  {
-    if (grid[y][xi] >= z)
-    {
-      votes.left = false;
-      break;
-    }
-  }
-
-  // Check down
-  for (let yi = y + 1; yi < h; yi++)
-  {
-    if (grid[yi][x] >= z)
-    {
-      votes.down = false;
-      break;
-    }
-  }
-
-  // Check up
-  for (let yi = 0; yi < y; yi++)
-  {
-    if (grid[yi][x] >= z)
-    {
-      votes.up = false;
-      break;
-    }
-  }
-
-  return Object.values(votes).reduce((a, v) => a || v, false);
+  return (
+    x === 0 || y === 0 || x === w - 1 || y === h - 1 ||
+    z > Math.max(...grid[y].slice(x + 1, w)) ||
+    z > Math.max(...grid[y].slice(0, x)) ||
+    z > Math.max(...grid.slice(y + 1, h).map(v => v[x])) ||
+    z > Math.max(...grid.slice(0, y).map(v => v[x]))
+  );
 }
 
 export default async function day8(target)
