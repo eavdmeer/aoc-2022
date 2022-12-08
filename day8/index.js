@@ -17,46 +17,34 @@ function viewScore(x, y, grid)
 
   const z = grid[y][x];
 
-  const scores = { left: x, right: w - x - 1, up: y, down: h - y - 1 };
+  const scores = { left: 0, right: 0, up: 0, down: 0 };
 
   // Check right
   for (let xi = x + 1; xi < w; xi++)
   {
-    if (grid[y][xi] >= z)
-    {
-      scores.right = xi - x;
-      break;
-    }
+    scores.right++;
+    if (grid[y][xi] >= z) { break; }
   }
 
   // Check left
   for (let xi = x - 1; xi >= 0; xi--)
   {
-    if (grid[y][xi] >= z)
-    {
-      scores.left = x - xi;
-      break;
-    }
+    scores.left++;
+    if (grid[y][xi] >= z) { break; }
   }
 
   // Check down
   for (let yi = y + 1; yi < h; yi++)
   {
-    if (grid[yi][x] >= z)
-    {
-      scores.down = yi - y;
-      break;
-    }
+    scores.down++;
+    if (grid[yi][x] >= z) { break; }
   }
 
   // Check up
   for (let yi = y - 1; yi >= 0; yi--)
   {
-    if (grid[yi][x] >= z)
-    {
-      scores.up = y - yi;
-      break;
-    }
+    scores.up++;
+    if (grid[yi][x] >= z) { break; }
   }
 
   return Object.values(scores).reduce((a, v) => a * v, 1);
