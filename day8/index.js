@@ -17,37 +17,18 @@ function viewScore(x, y, grid)
 
   const z = grid[y][x];
 
-  const scores = { left: 0, right: 0, up: 0, down: 0 };
-
-  // Check right
-  for (let xi = x + 1; xi < w; xi++)
-  {
-    scores.right++;
-    if (grid[y][xi] >= z) { break; }
-  }
-
-  // Check left
-  for (let xi = x - 1; xi >= 0; xi--)
-  {
-    scores.left++;
-    if (grid[y][xi] >= z) { break; }
-  }
-
-  // Check down
-  for (let yi = y + 1; yi < h; yi++)
-  {
-    scores.down++;
-    if (grid[yi][x] >= z) { break; }
-  }
-
-  // Check up
-  for (let yi = y - 1; yi >= 0; yi--)
-  {
-    scores.up++;
-    if (grid[yi][x] >= z) { break; }
-  }
-
-  return Object.values(scores).reduce((a, v) => a * v, 1);
+  return (
+    (1 + grid[y].slice(x + 1, w)
+      .findIndex(v => v >= z) || w - x - 1) *
+    (1 + grid[y].slice(0, x)
+      .findIndex(v => v >= z) || x) *
+    (1 + grid.slice(y + 1, h)
+      .map(v => v[x])
+      .findIndex(v => v >= z) || h - y - 1) *
+    (1 + grid.slice(0, y)
+      .map(v => v[x])
+      .findIndex(v => v >= z) || y)
+  );
 }
 
 function visible(x, y, grid)
