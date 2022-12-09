@@ -40,68 +40,13 @@ function drag(h, t, debug = false)
 {
   if (Math.abs(t.x - h.x) > 1 || Math.abs(t.y - h.y) > 1)
   {
-    const key = `(${t.x - h.x}, ${t.y - h.y})`;
-
-    if (debug)
+    if (t.x !== h.x)
     {
-      console.log(h, t, 'delta:', key);
+      move[t.x < h.x ? 'r' : 'l'](t);
     }
-
-    switch (key)
+    if (t.y !== h.y)
     {
-      case '(-2, 0)':
-        move.r(t);
-        break;
-      case '(2, 0)':
-        move.l(t);
-        break;
-      case '(0, -2)':
-        move.u(t);
-        break;
-      case '(0, 2)':
-        move.d(t);
-        break;
-
-      case '(-2, 1)':
-        move.r(t);
-        move.d(t);
-        break;
-      case '(-2, -1)':
-        move.r(t);
-        move.u(t);
-        break;
-
-      case '(2, 1)':
-        move.l(t);
-        move.d(t);
-        break;
-      case '(2, -1)':
-        move.l(t);
-        move.u(t);
-        break;
-
-      case '(-1, -2)':
-      case '(-2, -2)':
-        move.r(t);
-        move.u(t);
-        break;
-      case '(1, -2)':
-      case '(2, -2)':
-        move.l(t);
-        move.u(t);
-        break;
-
-      case '(-1, 2)':
-      case '(-2, 2)':
-        move.r(t);
-        move.d(t);
-        break;
-      case '(1, 2)':
-      case '(2, 2)':
-        move.l(t);
-        move.d(t);
-        break;
-      default:
+      move[t.y < h.y ? 'u' : 'd'](t);
     }
 
     if (debug)
