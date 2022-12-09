@@ -7,7 +7,7 @@ if (process.argv[2])
 
 function draw(knots)
 {
-  // console.log('knots:', knots);
+  console.clear();
   const zero = [ ...knots, { x: 0, y: 0 } ];
 
   const xmin = Math.min(...zero.map(v => v.x)) - 1;
@@ -36,7 +36,7 @@ const move = {
   u: p => p.y++
 };
 
-function drag(h, t, debug = false)
+function drag(h, t)
 {
   if (Math.abs(t.x - h.x) > 1 || Math.abs(t.y - h.y) > 1)
   {
@@ -48,15 +48,6 @@ function drag(h, t, debug = false)
     {
       move[t.y < h.y ? 'u' : 'd'](t);
     }
-
-    if (debug)
-    {
-      console.log('  moved to:', t);
-    }
-  }
-  else if (debug)
-  {
-    console.log(h, t, 'nothing to do');
   }
 }
 
@@ -110,7 +101,6 @@ export default async function day9(target)
   visited = { '0, 0': true };
   moves.forEach(m =>
   {
-    if (debug) { console.log('move', m.dir, m.count, 'steps'); }
     for (let i = 0; i < m.count; i++)
     {
       // Move the head
