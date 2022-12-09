@@ -85,18 +85,8 @@ export default async function day9(target)
 
   const part1 = Object.keys(visited).length;
 
-  const knots = [
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 },
-    { x: 0, y: 0 }
-  ];
+  const knots = [];
+  for (let i = 0; i < 10; i++) { knots.push({ x: 0, y: 0 }); }
 
   visited = { '0, 0': true };
   moves.forEach(m =>
