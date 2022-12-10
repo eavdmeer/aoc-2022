@@ -98,7 +98,7 @@ export default async function day9(target)
       // Drag the rest of the body
       for (let k = 1; k < knots.length; k++)
       {
-        drag(knots[k - 1], knots[k], false);
+        drag(knots[k - 1], knots[k]);
       }
       visited[`${knots[9].x}, ${knots[9].y}`] = true;
     }
