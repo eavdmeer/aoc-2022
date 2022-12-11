@@ -8,6 +8,7 @@ import day7 from './day7/index.js';
 import day8 from './day8/index.js';
 import day9 from './day9/index.js';
 import day10 from './day10/index.js';
+import day11 from './day11/index.js';
 
 async function getResults()
 {
@@ -21,7 +22,8 @@ async function getResults()
     await day7('day7/data.txt'),
     await day8('day8/data.txt'),
     await day9('day9/data.txt'),
-    await day10('day10/data.txt')
+    await day10('day10/data.txt'),
+    await day11('day11/data.txt')
   ];
   return result.sort((a, b) => a.day - b.day);
 }
