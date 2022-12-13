@@ -36,9 +36,12 @@ function pop(heap)
 
 function solve(data, start, end)
 {
+  const path = [];
   const heap = [];
   heap.push({ cost: 0, loc: start });
   const visited = {};
+
+  let h = 0;
 
   while (`${end.x},${end.y}` in visited === false)
   {
@@ -52,10 +55,14 @@ function solve(data, start, end)
     const key = `${loc.x},${loc.y}`;
     if (key in visited) { continue; }
 
+    path.push({ x: loc.x, y: loc.y, delta: data[loc.y][loc.x] - h });
+    h = data[loc.y][loc.x];
+
     visited[key] = { cost, loc };
 
     if (loc.x === end.x && loc.y === end.y)
     {
+      console.log(path);
       return cost;
     }
 
