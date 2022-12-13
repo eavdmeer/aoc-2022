@@ -27,7 +27,7 @@ function neighbors(data, x, y)
       data[p.y][p.x] - data[y][x] <= 1);
 }
 
-function pop(heap)
+function popCheapest(heap)
 {
   // pop the item on the heap with the lowest cost and return it
   const min = Math.min(...heap.map(v => v.cost));
@@ -37,20 +37,34 @@ function pop(heap)
 function solve(data, start, end)
 {
   const path = [];
+  let h = 0;
+
+  // Implement Dijkstra's algorithm for finding the shortest path:
+  // Keep track of candidates on a priority queue or heap.
+  //
+  // Keep track of visited places in a hash.
+  //
+  // Add the start point to the heap to begin.
+  //
+  // Repeat until we reach the target or run out of candidates:
+  // - Take the candidate with the lowest cost so far off the heap
+  // - If we've visited this coordinate already, continue to the next
+  // - Add candidate to list of visited.
+  // - Check if we reached the destination
+  // - If not, add all neighbors on the priority queue
+  //
   const heap = [];
   heap.push({ cost: 0, loc: start });
   const visited = {};
-
-  let h = 0;
 
   while (`${end.x},${end.y}` in visited === false)
   {
     if (heap.length === 0)
     {
-      // throw new Error('No more open paths! Unable to reach end point!');
+      console.log('No more open paths! Unable to reach end point!');
       return -1;
     }
-    const { cost, loc } = pop(heap);
+    const { cost, loc } = popCheapest(heap);
 
     const key = `${loc.x},${loc.y}`;
     if (key in visited) { continue; }
