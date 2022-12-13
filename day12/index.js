@@ -62,7 +62,7 @@ function solve(data, start, end)
 
     if (loc.x === end.x && loc.y === end.y)
     {
-      console.log(path);
+      debug(path);
       return cost;
     }
 
