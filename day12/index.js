@@ -13,7 +13,7 @@ function debug(...args)
   console.log(...args);
 }
 
-function neighbors(data, x, y)
+function neighbors(data, x, y, reverse = false)
 {
   const points = [
     { x: x + 1, y },
@@ -24,7 +24,9 @@ function neighbors(data, x, y)
   return points
     .filter(p => p.x >= 0 && p.y >= 0 &&
       p.x < data.width && p.y < data.height &&
-      data[p.y][p.x] - data[y][x] <= 1);
+      (! reverse && data[p.y][p.x] - data[y][x] <= 1 ||
+       reverse && data[y][x] - data[p.y][p.x] <= 1
+      ));
 }
 
 function popCheapest(heap)
@@ -34,7 +36,7 @@ function popCheapest(heap)
   return heap.splice(heap.findIndex(v => v.cost === min), 1).pop();
 }
 
-function solve(data, start, end)
+function solve(data, start, end, reverse = false)
 {
   const path = [];
   let h = 0;
@@ -61,8 +63,7 @@ function solve(data, start, end)
   {
     if (heap.length === 0)
     {
-      console.log('No more open paths! Unable to reach end point!');
-      return -1;
+      throw new Error('No more open paths! Unable to reach end point!');
     }
     const { cost, loc } = popCheapest(heap);
 
@@ -74,13 +75,18 @@ function solve(data, start, end)
 
     visited[key] = { cost, loc };
 
-    if (loc.x === end.x && loc.y === end.y)
+    if (reverse && h === 0)
+    {
+      debug(path);
+      return cost;
+    }
+    else if (loc.x === end.x && loc.y === end.y)
     {
       debug(path);
       return cost;
     }
 
-    neighbors(data, loc.x, loc.y).forEach(l =>
+    neighbors(data, loc.x, loc.y, reverse).forEach(l =>
     {
       heap.push({ cost: cost + 1, loc: { x: l.x, y: l.y } });
     });
@@ -128,17 +134,8 @@ export default async function day12(target)
 
   const part1 = solve(data, begin, end);
 
-  const startPoints = [];
-  data.forEach((row, y) =>
-    row.forEach((h, x) =>
-    {
-      if (h === 0) { startPoints.push({ x, y }); }
-    })
-  );
-  const part2 = Math.min(...startPoints
-    .map(p => solve(data, p, end))
-    .filter(v => v >= 0)
-  );
+  // Backtrack from the end to the nearest square that's zero
+  const part2 = solve(data, end, begin, true);
 
   return { day: 12, part1, part2, duration: Date.now() - start };
 }
