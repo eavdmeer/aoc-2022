@@ -24,7 +24,7 @@ function neighbors(data, x, y)
   return points
     .filter(([ px, py ]) => px >= 0 && py >= 0 &&
       px < data.width && py < data.height &&
-      Math.abs(data[py][px] - data[y][x]) <= 1);
+      data[py][px] - data[y][x] <= 1);
 }
 
 function pop(heap)
