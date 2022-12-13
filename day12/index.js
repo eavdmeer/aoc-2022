@@ -44,7 +44,8 @@ function solve(data, start, end)
   {
     if (heap.length === 0)
     {
-      throw new Error('No more open paths! Unable to reach end point!');
+      // throw new Error('No more open paths! Unable to reach end point!');
+      return -1;
     }
     const { cost, loc } = pop(heap);
 
@@ -106,7 +107,17 @@ export default async function day12(target)
 
   const part1 = solve(data, begin, end);
 
-  const part2 = '';
+  const startPoints = [];
+  data.forEach((row, y) =>
+    row.forEach((h, x) =>
+    {
+      if (h === 0) { startPoints.push({ x, y }); }
+    })
+  );
+  const part2 = Math.min(...startPoints
+    .map(p => solve(data, p, end))
+    .filter(v => v >= 0)
+  );
 
   return { day: 12, part1, part2, duration: Date.now() - start };
 }
