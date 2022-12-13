@@ -21,12 +21,12 @@ function compare(left, right)
   if (left !== undefined && right === undefined)
   {
     debug('  right is out of items first, wrong order');
-    return -1;
+    return 1;
   }
   if (left === undefined && right !== undefined)
   {
     debug('  left is out of items first, correct order');
-    return 1;
+    return -1;
   }
 
   if (typeof left === 'number' && typeof right === 'number')
@@ -35,12 +35,12 @@ function compare(left, right)
     if (left < right)
     {
       debug('  correct order');
-      return 1;
+      return -1;
     }
     else if (left > right)
     {
       debug('  wrong order');
-      return -1;
+      return 1;
     }
     debug('  need more checks');
     return 0;
@@ -87,7 +87,7 @@ export default async function day13(target)
   debug(data);
 
   const part1 = data
-    .map(([ l, r ]) => compare(l, r) !== -1)
+    .map(([ l, r ]) => compare(l, r) !== 1)
     .reduce((a, v, i) => a + (v ? i + 1 : 0), 0);
 
   const packets = [
@@ -100,7 +100,7 @@ export default async function day13(target)
     packets.push(r);
   });
 
-  const sorted = packets.sort(compare).reverse();
+  const sorted = packets.sort(compare);
 
   const part2 = (1 + sorted.findIndex(v => v[0] && v[0][0] === 2)) *
     (1 + sorted.findIndex(v => v[0] && v[0][0] === 6));
