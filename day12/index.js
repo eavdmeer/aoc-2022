@@ -16,15 +16,15 @@ function debug(...args)
 function neighbors(data, x, y)
 {
   const points = [
-    [ x + 1, y ],
-    [ x, y + 1 ],
-    [ x - 1, y ],
-    [ x, y - 1 ]
+    { x: x + 1, y },
+    { x, y: y + 1 },
+    { x: x - 1, y },
+    { x, y: y - 1 }
   ];
   return points
-    .filter(([ px, py ]) => px >= 0 && py >= 0 &&
-      px < data.width && py < data.height &&
-      data[py][px] - data[y][x] <= 1);
+    .filter(p => p.x >= 0 && p.y >= 0 &&
+      p.x < data.width && p.y < data.height &&
+      data[p.y][p.x] - data[y][x] <= 1);
 }
 
 function pop(heap)
@@ -68,7 +68,7 @@ function solve(data, start, end)
 
     neighbors(data, loc.x, loc.y).forEach(l =>
     {
-      heap.push({ cost: cost + 1, loc: { x: l[0], y: l[1] } });
+      heap.push({ cost: cost + 1, loc: { x: l.x, y: l.y } });
     });
   }
 
