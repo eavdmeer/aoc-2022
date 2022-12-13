@@ -102,8 +102,9 @@ export default async function day13(target)
 
   const sorted = packets.sort(compare);
 
-  const part2 = (1 + sorted.findIndex(v => v[0] && v[0][0] === 2)) *
-    (1 + sorted.findIndex(v => v[0] && v[0][0] === 6));
+  const part2 =
+    (1 + sorted.findIndex(v => JSON.stringify(v) === '[[2]]')) *
+    (1 + sorted.findIndex(v => JSON.stringify(v) === '[[6]]'));
 
   return { day: 13, part1, part2, duration: Date.now() - start };
 }
