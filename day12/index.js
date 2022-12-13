@@ -13,24 +13,7 @@ function debug(...args)
   console.log(...args);
 }
 
-// Optimistic estimate of the total risk from (x,y) to the bottom right,
-// assuming all remaining risk values are 1 and starting at current cost
-function estimate(data, x, y, cost)
-{
-  return cost + data.width - 1 - x + data.height - y - 1;
-}
-
-function riskLevel(data, x, y)
-{
-  // const r = data[y % data.height][x % data.width];
-  const r = 1;
-  const b = Math.floor(x / data.width) + Math.floor(y / data.height);
-
-  // risk level of (x,y)
-  return Math.floor((r + b) / 10) + (r + b) % 10;
-}
-
-function getNeighbors(data, x, y)
+function neighbors(data, x, y)
 {
   const points = [
     [ x + 1, y ],
@@ -44,61 +27,44 @@ function getNeighbors(data, x, y)
       Math.abs(data[py][px] - data[y][x]) <= 1);
 }
 
-function getPathRisk(data, start, end)
+function pop(heap)
 {
-  // start open paths at start point (xStart, yStart)
-  const open = {};
-  open[`${start.x},${start.y}`] = [ 0, estimate(data, start.x, start.y, 0) ];
+  // pop the item on the heap with the lowest cost and return it
+  const min = Math.min(...heap.map(v => v.cost));
+  return heap.splice(heap.findIndex(v => v.cost === min), 1).pop();
+}
 
-  // keep track of closed paths who's neighbors have been investigated
-  const closed = {};
+function solve(data, start, end)
+{
+  const heap = [];
+  heap.push({ cost: 0, loc: start });
+  const visited = {};
 
-  // repeat until we've reached the bottom right
-  /* eslint-disable-next-line no-unmodified-loop-condition */
-  while (`${end.x},${end.y}` in closed === false)
+  while (`${end.x},${end.y}` in visited === false)
   {
-    debug('open:', open);
-    debug('closed:', closed);
-
-    // Sanity check
-    if (Object.keys(open).length === 0)
+    if (heap.length === 0)
     {
       throw new Error('No more open paths! Unable to reach end point!');
     }
+    const { cost, loc } = pop(heap);
 
-    // move the most promising entry (x,y) on open to closed
-    const min = Math.min(...Object.values(open).map(v => v[1]));
-    debug('min:', min);
-    const [ x, y ] = Object.entries(open)
-      .find(([ , v ]) => v[1] === min)
-      .shift()
-      .split(',')
-      .map(v => parseInt(v, 10));
-    debug('[x, y]', [ x, y ]);
+    const key = `${loc.x},${loc.y}`;
+    if (key in visited) { continue; }
 
-    const key = `${x},${y}`;
-    const [ d, e ] = open[key];
-    debug('[d, e]', [ d, e ]);
-    closed[key] = [ d, e ];
-    delete open[key];
+    visited[key] = { cost, loc };
 
-    // move neighbors of (x,y) to open if they are not already on closed
-    getNeighbors(data, x, y).forEach(([ v, w ]) =>
+    if (loc.x === end.x && loc.y === end.y)
     {
-      debug('neighbor:', [ v, w ]);
-      if (`${v},${w}` in closed === false)
-      {
-        const d00 = Math.min(
-          (open[`${v},${w}`] || [ 999999999999 ])[0],
-          d + riskLevel(data, v, w));
-        open[`${v},${w}`] = [ d00, estimate(data, v, w, d00) ];
-      }
+      return cost;
+    }
+
+    neighbors(data, loc.x, loc.y).forEach(l =>
+    {
+      heap.push({ cost: cost + 1, loc: { x: l[0], y: l[1] } });
     });
   }
 
-  debug('cost:', closed[`${end.x},${end.y}`][0]);
-
-  return closed[`${end.x},${end.y}`][0];
+  return -1;
 }
 
 export default async function day12(target)
@@ -138,7 +104,7 @@ export default async function day12(target)
 
   debug('begin:', begin, 'end:', end);
 
-  const part1 = getPathRisk(data, begin, end);
+  const part1 = solve(data, begin, end);
 
   const part2 = '';
 
