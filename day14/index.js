@@ -94,7 +94,7 @@ function Grid(lines, source, addFloor = false)
       const idx = this.getCol(x).findIndex(free);
 
       // Fell through the colomn. Done
-      if (idx === undefined) { break; }
+      if (idx === -1) { break; }
 
       // Check the column on the left
       const left = this.charAt({ x: x - 1, y: idx });
