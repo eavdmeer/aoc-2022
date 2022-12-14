@@ -2,6 +2,12 @@ import * as fs from 'node:fs/promises';
 
 /* eslint-disable no-eval */
 
+// Markers
+const EMPTY = '.';
+const SAND = 'o';
+const SOURCE = '+';
+const STONE = '#';
+
 let doDebug = false;
 if (process.argv[2])
 {
@@ -13,6 +19,128 @@ function debug(...args)
 {
   if (! doDebug) { return; }
   console.log(...args);
+}
+
+function Grid(lines, source)
+{
+  debug('create grid from', lines);
+
+  this.source = source;
+
+  const points = [ { x: 500, y: 0 } ];
+  lines.forEach(line => line.forEach(p => points.push(p)));
+
+  this.xmin = Math.min(...points.map(v => v.x));
+  this.xmax = Math.max(...points.map(v => v.x));
+  this.ymin = Math.min(...points.map(v => v.y));
+  this.ymax = Math.max(...points.map(v => v.y));
+
+  // Allocate an empty grid with columns for each x
+  this.cols = [];
+  for (let x = this.xmin; x <= this.xmax; x++)
+  {
+    const col = [];
+    for (let y = this.ymin; y <= this.ymax; y++)
+    {
+      col.push(EMPTY);
+    }
+    this.cols.push(col);
+  }
+
+  // Get width and height for convenience
+  this.width = this.cols.length;
+  this.height = this.cols[0].length;
+
+  // Utility functions
+  this.putChar = (p, c) => this.cols[p.x - this.xmin][p.y - this.ymin] = c;
+  this.charAt = p => this.cols[p.x - this.xmin]?.[p.y - this.ymin];
+  this.getCol = x => this.cols[x - this.xmin];
+  this.draw = clear =>
+  {
+    if (clear) { console.clear(); }
+
+    const rows = [];
+    for (let y = 0; y < this.cols[0].length; y++)
+    {
+      const row = [];
+      for (let x = 0; x < this.cols.length; x++)
+      {
+        row.push(this.cols[x][y]);
+      }
+      rows.push(row);
+    }
+    console.log(rows.map(r => r.join('')).join('\n'));
+  };
+  this.dropSand = (src = this.source) =>
+  {
+    debug('dropping sand from:', src);
+    const p = { ...src };
+
+    const idx = this.getCol(p.x)
+      .findIndex((v, y) => y > p.y && v !== EMPTY);
+
+    // Fell through the colomn. Done
+    if (idx === undefined) { return false; }
+
+    debug('obstruction at', p.x, idx);
+
+    // Check the column on the left
+    const left = this.charAt({ x: p.x - 1, y: idx });
+    // Fell off the grid on the left side
+    if (left === undefined) { return false; }
+    if (left === EMPTY)
+    {
+      debug('left down is free');
+      return this.dropSand({ x: p.x - 1, y: idx });
+    }
+    debug('left down blocked by', left);
+
+    // Check the column on the right
+    const right = this.charAt({ x: p.x + 1, y: idx });
+    // Fell off the grid on the right side
+    if (left === undefined) { return false; }
+    if (right === EMPTY)
+    {
+      debug('right down is free');
+      return this.dropSand({ x: p.x + 1, y: idx });
+    }
+    debug('right down blocked by', right);
+
+    // Sand settles
+    debug('settling grain of sand');
+    this.putChar({ x: p.x, y: idx - 1 }, SAND);
+
+    return true;
+  };
+
+  // Draw the sand origin
+  this.putChar({ x: this.source.x, y: this.source.y }, SOURCE);
+
+  // Draw all lines
+  lines.forEach(line =>
+  {
+    for (let i = 0; i < line.length - 1; i++)
+    {
+      const p1 = line[i];
+      const p2 = line[i + 1];
+      if (p1.x === p2.x)
+      {
+        // vertical line
+        for (let y = Math.min(p1.y, p2.y); y <= Math.max(p1.y, p2.y); y++)
+        {
+          this.putChar({ x: p1.x, y }, STONE);
+        }
+      }
+      else if (p1.y === p2.y)
+      {
+        // horizontal
+        for (let x = Math.min(p1.x, p2.x); x <= Math.max(p1.x, p2.x); x++)
+        {
+          this.putChar({ x, y: p1.y }, STONE);
+        }
+      }
+    }
+  });
 }
 
 export default async function day14(target)
@@ -32,9 +160,16 @@ export default async function day14(target)
       .map(w => ({ x: w[0], y: w[1] }))
     );
 
-  debug(data);
+  const d = new Grid(data, { x: 500, y: 0 });
 
-  const part1 = '';
+  let cnt = 0;
+  while (d.dropSand())
+  {
+    if (doDebug) { d.draw(true); }
+    cnt++;
+  }
+
+  const part1 = cnt;
 
   const part2 = '';
 
