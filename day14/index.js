@@ -41,14 +41,8 @@ function Grid(lines, source, addFloor = false)
     const w = 2 + this.ymax - this.ymin;
     debug('adding floor width', 2 * w);
 
-    if (500 - this.xmin < w)
-    {
-      this.xmin = 500 - w;
-    }
-    if (this.xmax - 500 < w)
-    {
-      this.xmax = 500 + w;
-    }
+    if (500 - this.xmin < w) { this.xmin = 500 - w; }
+    if (this.xmax - 500 < w) { this.xmax = 500 + w; }
 
     this.ymax += 2;
   }
@@ -64,10 +58,6 @@ function Grid(lines, source, addFloor = false)
     }
     this.cols.push(col);
   }
-
-  // Get width and height for convenience
-  this.width = this.cols.length;
-  this.height = this.cols[0].length;
 
   // Utility functions
   this.putChar = (p, c) => this.cols[p.x - this.xmin][p.y - this.ymin] = c;
@@ -94,7 +84,7 @@ function Grid(lines, source, addFloor = false)
     debug('dropping sand from:', src);
     const p = { ...src };
 
-    // Source is already occupied with sand
+    // Source is already occupied with sand or rock
     if (this.charAt(src) === SAND) { return false; }
 
     const idx = this.getCol(p.x)
@@ -103,29 +93,17 @@ function Grid(lines, source, addFloor = false)
     // Fell through the colomn. Done
     if (idx === undefined) { return false; }
 
-    debug('obstruction at', p.x, idx);
-
     // Check the column on the left
     const left = this.charAt({ x: p.x - 1, y: idx });
     // Fell off the grid on the left side
     if (left === undefined) { return false; }
-    if (left === EMPTY)
-    {
-      debug('left down is free');
-      return this.dropSand({ x: p.x - 1, y: idx });
-    }
-    debug('left down blocked by', left);
+    if (left === EMPTY) { return this.dropSand({ x: p.x - 1, y: idx }); }
 
     // Check the column on the right
     const right = this.charAt({ x: p.x + 1, y: idx });
     // Fell off the grid on the right side
     if (left === undefined) { return false; }
-    if (right === EMPTY)
-    {
-      debug('right down is free');
-      return this.dropSand({ x: p.x + 1, y: idx });
-    }
-    debug('right down blocked by', right);
+    if (right === EMPTY) { return this.dropSand({ x: p.x + 1, y: idx }); }
 
     // Sand settles
     debug('settling grain of sand');
