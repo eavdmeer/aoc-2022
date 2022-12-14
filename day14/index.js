@@ -79,37 +79,53 @@ function Grid(lines, source, addFloor = false)
     }
     console.log(rows.map(r => r.join('')).join('\n'));
   };
-  this.dropSand = (src = this.source) =>
+  this.dropSand = (p = this.source) =>
   {
-    debug('dropping sand from:', src);
-    const p = { ...src };
+    debug('dropping sand from:', p);
 
-    // Source is already occupied with sand or rock
-    if (this.charAt(src) === SAND) { return false; }
+    // Source is already occupied with sand
+    if (this.charAt(p) === SAND) { return false; }
 
-    const idx = this.getCol(p.x)
-      .findIndex((v, y) => y > p.y && v !== EMPTY);
+    let x = p.x;
+    let y = p.y;
+    const free = (v, yv) => yv > y && v !== EMPTY;
+    while (y < this.ymax)
+    {
+      const idx = this.getCol(x).findIndex(free);
 
-    // Fell through the colomn. Done
-    if (idx === undefined) { return false; }
+      // Fell through the colomn. Done
+      if (idx === undefined) { break; }
 
-    // Check the column on the left
-    const left = this.charAt({ x: p.x - 1, y: idx });
-    // Fell off the grid on the left side
-    if (left === undefined) { return false; }
-    if (left === EMPTY) { return this.dropSand({ x: p.x - 1, y: idx }); }
+      // Check the column on the left
+      const left = this.charAt({ x: x - 1, y: idx });
+      // Fell off the grid on the left side
+      if (left === undefined) { break; }
+      if (left === EMPTY)
+      {
+        x--;
+        y = idx;
+        continue;
+      }
 
-    // Check the column on the right
-    const right = this.charAt({ x: p.x + 1, y: idx });
-    // Fell off the grid on the right side
-    if (left === undefined) { return false; }
-    if (right === EMPTY) { return this.dropSand({ x: p.x + 1, y: idx }); }
+      // Check the column on the right
+      const right = this.charAt({ x: x + 1, y: idx });
+      // Fell off the grid on the right side
+      if (left === undefined) { break; }
+      if (right === EMPTY)
+      {
+        x++;
+        y = idx;
+        continue;
+      }
 
-    // Sand settles
-    debug('settling grain of sand');
-    this.putChar({ x: p.x, y: idx - 1 }, SAND);
+      // Sand settles
+      debug('settling grain of sand');
+      this.putChar({ x: x, y: idx - 1 }, SAND);
 
-    return true;
+      return true;
+    }
+
+    return false;
   };
 
   // Draw the sand origin
