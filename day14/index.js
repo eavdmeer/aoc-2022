@@ -23,8 +23,6 @@ function debug(...args)
 
 function Grid(lines, source, addFloor = false)
 {
-  debug('create grid from', lines);
-
   this.source = source;
 
   const points = [ { x: 500, y: 0 } ];
@@ -39,7 +37,6 @@ function Grid(lines, source, addFloor = false)
   {
     // Required width for a full pyramid
     const w = 2 + this.ymax - this.ymin;
-    debug('adding floor width', 2 * w);
 
     if (500 - this.xmin < w) { this.xmin = 500 - w; }
     if (this.xmax - 500 < w) { this.xmax = 500 + w; }
@@ -81,8 +78,6 @@ function Grid(lines, source, addFloor = false)
   };
   this.dropSand = (p = this.source) =>
   {
-    debug('dropping sand from:', p);
-
     // Source is already occupied with sand
     if (this.charAt(p) === SAND) { return false; }
 
@@ -119,7 +114,6 @@ function Grid(lines, source, addFloor = false)
       }
 
       // Sand settles
-      debug('settling grain of sand');
       this.putChar({ x: x, y: idx - 1 }, SAND);
 
       return true;
@@ -139,7 +133,6 @@ function Grid(lines, source, addFloor = false)
       { x: this.xmin, y: this.ymax },
       { x: this.xmax, y: this.ymax }
     ]);
-    debug('added floor line', allLines);
   }
   allLines.forEach(line =>
   {
@@ -184,6 +177,7 @@ export default async function day14(target)
       )
       .map(w => ({ x: w[0], y: w[1] }))
     );
+  debug(data);
 
   const g1 = new Grid(data, { x: 500, y: 0 });
 
