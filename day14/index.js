@@ -21,7 +21,7 @@ function debug(...args)
   console.log(...args);
 }
 
-function Grid(lines, source)
+function Grid(lines, source, addFloor = false)
 {
   debug('create grid from', lines);
 
@@ -34,6 +34,24 @@ function Grid(lines, source)
   this.xmax = Math.max(...points.map(v => v.x));
   this.ymin = Math.min(...points.map(v => v.y));
   this.ymax = Math.max(...points.map(v => v.y));
+
+  if (addFloor)
+  {
+    // Required width for a full pyramid
+    const w = 2 + this.ymax - this.ymin;
+    debug('adding floor width', 2 * w);
+
+    if (500 - this.xmin < w)
+    {
+      this.xmin = 500 - w;
+    }
+    if (this.xmax - 500 < w)
+    {
+      this.xmax = 500 + w;
+    }
+
+    this.ymax += 2;
+  }
 
   // Allocate an empty grid with columns for each x
   this.cols = [];
@@ -76,6 +94,9 @@ function Grid(lines, source)
     debug('dropping sand from:', src);
     const p = { ...src };
 
+    // Source is already occupied with sand
+    if (this.charAt(src) === SAND) { return false; }
+
     const idx = this.getCol(p.x)
       .findIndex((v, y) => y > p.y && v !== EMPTY);
 
@@ -117,7 +138,16 @@ function Grid(lines, source)
   this.putChar({ x: this.source.x, y: this.source.y }, SOURCE);
 
   // Draw all lines
-  lines.forEach(line =>
+  const allLines = [ ...lines ];
+  if (addFloor)
+  {
+    allLines.push([
+      { x: this.xmin, y: this.ymax },
+      { x: this.xmax, y: this.ymax }
+    ]);
+    debug('added floor line', allLines);
+  }
+  allLines.forEach(line =>
   {
     for (let i = 0; i < line.length - 1; i++)
     {
@@ -141,6 +171,7 @@ function Grid(lines, source)
       }
     }
   });
+
 }
 
 export default async function day14(target)
@@ -160,18 +191,26 @@ export default async function day14(target)
       .map(w => ({ x: w[0], y: w[1] }))
     );
 
-  const d = new Grid(data, { x: 500, y: 0 });
+  const g1 = new Grid(data, { x: 500, y: 0 });
 
   let cnt = 0;
-  while (d.dropSand())
+  while (g1.dropSand())
   {
-    if (doDebug) { d.draw(true); }
+    if (doDebug) { g1.draw(true); }
     cnt++;
   }
 
   const part1 = cnt;
 
-  const part2 = '';
+  const g2 = new Grid(data, { x: 500, y: 0 }, true);
+  cnt = 0;
+  while (g2.dropSand())
+  {
+    if (doDebug) { g2.draw(true); }
+    cnt++;
+  }
+
+  const part2 = cnt;
 
   return { day: 14, part1, part2, duration: Date.now() - start };
 }
