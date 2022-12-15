@@ -23,7 +23,7 @@ export default async function day14(target)
 
   const manhatten = (x1, y1, x2, y2) => Math.abs(x2 - x1) + Math.abs(y2 - y1);
 
-  const data = content
+  const sensors = content
     .toString()
     .split(/\s*\n\s*/)
     .filter(v => v)
@@ -43,33 +43,73 @@ export default async function day14(target)
       return v;
     });
 
-  debug(data);
+  debug(sensors);
 
-  const y = target.includes('example') ? 10 : 2000000;
+  const yval = target.includes('example') ? 10 : 2000000;
 
-  const beacons = data
-    .filter(v => v.nearest.y === y)
-    .map(v => v.nearest.x)
-    .filter((v, i, a) => a.indexOf(v) === i);
-  debug('beacons at y =', y, beacons);
-
-  const minx = Math.min(...data.map(v => v.x - v.radius));
-  const maxx = Math.max(...data.map(v => v.x + v.radius));
-
-  let cnt = 0;
-  for (let x = minx; x < maxx; x++)
+  // x-interval in range for a sensor for a certain y value
+  const range = (sensor, y) =>
   {
-    if (data.some(sensor =>
-      manhatten(x, y, sensor.x, sensor.y) <= sensor.radius) &&
-      ! beacons.includes(x))
+    const dx = sensor.radius - Math.abs(sensor.y - y);
+    return dx < 0 ? [] : [ sensor.x - dx, sensor.x + dx ];
+  };
+  const ranges = sensors
+    .map(v => range(v, yval))
+    .filter(v => v.length)
+    .sort((a, b) => a[0] - b[0]);
+  debug(ranges);
+
+  // Reduce all overlapping intervals
+  const reduced = [];
+  let [ min, max ] = ranges[0];
+  ranges.forEach(next =>
+  {
+    if (next[0] > max)
     {
-      cnt++;
+      // unconnected new interval
+      reduced.push([ min, max ]);
+      min = next[0];
+      max = next[1];
     }
-  }
+    else
+    {
+      // connecting or overlapping interval
+      if (next[1] > max)
+      {
+        max = next[1];
+      }
+    }
+  });
+  // Add last interval we were working on
+  reduced.push([ min, max ]);
+  debug('reduced:', reduced);
 
-  const part1 = cnt;
+  const part1 = reduced
+    .map(v => v[1] - v[0])
+    .reduce((a, v) => a + v, 0);
 
+  /*
+   * line equations of the bounding lines for each sensor
+   *
+   *  Downward
+   *filter  y = -x + sensor.y + sensor.x + sensor.radius
+   *  y = -x + sensor.y + sensor.x - sensor.radius
+
+   *  Upward
+   *  y = x + sensor.y - sensor.x + sensor.radius
+   *  y = x + sensor.y - sensor.x - sensor.radius
+   */
   const part2 = '';
+
+  const down = [
+    ...sensors.map(s => s.y + s.x + s.radius),
+    ...sensors.map(s => s.y + s.x - s.radius) ];
+  debug(down);
+
+  const up = [
+    ...sensors.map(s => s.y - s.x + s.radius),
+    ...sensors.map(s => s.y - s.x - s.radius) ];
+  debug(up);
 
   return { day: 14, part1, part2, duration: Date.now() - start };
 }
