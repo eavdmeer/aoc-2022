@@ -62,22 +62,19 @@ export default async function day14(target)
   // Reduce all overlapping intervals
   const reduced = [];
   let [ min, max ] = ranges[0];
-  ranges.forEach(next =>
+  ranges.forEach(([ nextMin, nextMax ]) =>
   {
-    if (next[0] > max)
+    if (nextMin > max)
     {
-      // unconnected new interval
+      // Found unconnected new interval
       reduced.push([ min, max ]);
-      min = next[0];
-      max = next[1];
+      min = nextMin;
+      max = nextMax;
     }
-    else
+    else if (nextMax > max)
     {
-      // connecting or overlapping interval
-      if (next[1] > max)
-      {
-        max = next[1];
-      }
+      // Overlapping interval. Extend our current maximum
+      max = nextMax;
     }
   });
   // Add last interval we were working on
