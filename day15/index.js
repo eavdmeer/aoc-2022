@@ -36,11 +36,38 @@ export default async function day14(target)
         x: parseInt(v[3], 10),
         y: parseInt(v[4], 10)
       }
-    }));
+    }))
+    .map(v =>
+    {
+      v.radius = manhatten(v.x, v.y, v.nearest.x, v.nearest.y);
+      return v;
+    });
 
   debug(data);
 
-  const part1 = '';
+  const y = target.includes('example') ? 10 : 2000000;
+
+  const beacons = data
+    .filter(v => v.nearest.y === y)
+    .map(v => v.nearest.x)
+    .filter((v, i, a) => a.indexOf(v) === i);
+  debug('beacons at y =', y, beacons);
+
+  const minx = Math.min(...data.map(v => v.x - v.radius));
+  const maxx = Math.max(...data.map(v => v.x + v.radius));
+
+  let cnt = 0;
+  for (let x = minx; x < maxx; x++)
+  {
+    if (data.some(sensor =>
+      manhatten(x, y, sensor.x, sensor.y) <= sensor.radius) &&
+      ! beacons.includes(x))
+    {
+      cnt++;
+    }
+  }
+
+  const part1 = cnt;
 
   const part2 = '';
 
