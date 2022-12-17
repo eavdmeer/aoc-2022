@@ -4,7 +4,7 @@ let doDebug = false;
 if (process.argv[2])
 {
   doDebug = process.argv[2].includes('example');
-  day14(process.argv[2]).then(console.log);
+  day15(process.argv[2]).then(console.log);
 }
 
 function debug(...args)
@@ -13,7 +13,7 @@ function debug(...args)
   console.log(...args);
 }
 
-export default async function day14(target)
+export default async function day15(target)
 {
   const start = Date.now();
 
@@ -108,5 +108,5 @@ export default async function day14(target)
     ...sensors.map(s => s.y - s.x - s.radius) ];
   debug(up);
 
-  return { day: 14, part1, part2, duration: Date.now() - start };
+  return { day: 15, part1, part2, duration: Date.now() - start };
 }
