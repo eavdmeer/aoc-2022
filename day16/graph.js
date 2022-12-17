@@ -22,9 +22,9 @@ Graph.prototype.edges = function()
 {
   return this.data.edges;
 };
-Graph.prototype.insert = function(node)
+Graph.prototype.insert = function(...args)
 {
-  this.data.nodes.push(node);
+  this.data.nodes.push(...args);
 };
 Graph.prototype.connect = function(n, m, weight = 1, uni = false)
 {
