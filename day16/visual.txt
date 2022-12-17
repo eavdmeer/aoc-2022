@@ -1,0 +1,44 @@
+AA II JJ II AA BB CC DD EE FF GG HH
+
+
+
+AA DD CC BB AA II JJ II AA DD EE FF GG HH GG FF EE DD CC
+
+T  Valve Action      Flow
+01  AA   move to DD    0
+02  DD   open DD       0
+03  DD   move to CC   20
+04  CC   move to BB   20
+05  BB   open BB      20
+06  BB   move to AA   33
+07  AA   move to II   33
+08  II   move to JJ   33
+09  JJ   open JJ      33
+10  JJ   move to II   54
+11  II   move to AA   54
+12  AA   move to DD   54
+13  DD   move to EE   54
+14  EE   move to FF   54
+15  FF   move to GG   54
+16  GG   move to HH   54
+17  HH   open HH      54
+18  HH   move to GG   76
+19  GG   move to FF   76
+20  FF   move to EE   76
+21  EE   open EE      76
+22  EE   move to DD   79
+23  DD   move to CC   79
+24  CC   open CC      79
+25  CC   -            81
+26  CC   -            81
+27  CC   -            81
+29  CC   -            81
+29  CC   -            81
+29  CC   -            81
+                     ---- +
+                     1651
+
+                          ----------------
+                         |                |
+HH -- GG -- FF -- EE -- DD -- CC -- BB -- AA -- II -- JJ
+22     0     0     3    20     2    13     0     0    21
