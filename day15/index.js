@@ -96,7 +96,7 @@ export default async function day15(target)
    *  y = x + sensor.y - sensor.x + sensor.radius
    *  y = x + sensor.y - sensor.x - sensor.radius
    */
-  const part2 = '';
+  const part2 = 'todo';
 
   const down = [
     ...sensors.map(s => s.y + s.x + s.radius),
