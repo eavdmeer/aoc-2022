@@ -38,21 +38,8 @@ function solve1(drops)
 
 const cache = {};
 
-const setCache = (key, val) =>
-{
-  debug('set cache', key, 'to', val);
-  cache[key] = val;
-};
-
-const getCache = key =>
-{
-  debug('found in cache:', cache[key]);
-  return cache[key];
-};
-
 function enclosed(drops, x, y, z, xr, yr, zr)
 {
-  debug('enclosed', drops);
   const stack = [ [ x, y, z ] ];
   const seen = new Set();
 
@@ -60,60 +47,39 @@ function enclosed(drops, x, y, z, xr, yr, zr)
     drops.some(v => ax === v[0] && ay === v[1] && az === v[2]);
 
   const key = `[ ${x}, ${y}, ${z} ]`;
-  debug('check', [ x, y, z ], xr, yr, zr);
-
-  if (key in cache) { return getCache(key); }
+  if (key in cache) { return cache[key]; }
 
   // Occupied cell
-  if (occupied(x, y, z))
-  {
-    debug('occupied cell => not enclosed');
-    // setCache(key, false);
-    return false;
-  }
-  debug('not an occupied cell');
+  if (occupied(x, y, z)) { return false; }
 
   while (stack.length > 0)
   {
     const [ px, py, pz ] = stack.pop();
 
     const wkey = `[ ${px}, ${py}, ${pz} ]`;
-    debug('while check', [ px, py, pz ]);
     if (wkey in cache)
     {
-      const v = getCache(wkey);
-      setCache(key, v);
+      const v = cache[wkey];
+      cache[key] = v;
       return v;
     }
 
     // Check occupied cells
-    if (occupied(px, py, pz))
-    {
-      debug('occupied => continue');
-      continue;
-    }
-    debug('not occupied');
+    if (occupied(px, py, pz)) { continue; }
 
     // Out of bounds check
     if (px > xr.max || px < xr.min ||
       py > yr.max || py < yr.min ||
       pz > zr.max || pz < zr.min)
     {
-      debug('out of bounds => not enclosed');
-      setCache(key, false);
-      setCache(wkey, false);
+      cache[key] = false;
+      cache[wkey] = false;
       return false;
     }
-    debug('not out of bounds');
 
     // Prevent infiinite looping
-    if (seen.has(wkey))
-    {
-      debug('already visited');
-      continue;
-    }
+    if (seen.has(wkey)) { continue; }
     seen.add(wkey);
-    debug('not visited yet');
 
     // Add neighbors
     stack.push([ px + 1, py, pz ]);
@@ -124,8 +90,7 @@ function enclosed(drops, x, y, z, xr, yr, zr)
     stack.push([ px, py, pz - 1 ]);
   }
 
-  debug('fall through');
-  setCache(key, true);
+  cache[key] = true;
 
   return true;
 }
@@ -137,29 +102,24 @@ function solve2(drops, part1)
     min: Math.min(...drops.map(v => v[0])),
     max: Math.max(...drops.map(v => v[0]))
   };
-  debug('x-range:', xr);
   const yr = {
     min: Math.min(...drops.map(v => v[1])),
     max: Math.max(...drops.map(v => v[1]))
   };
-  debug('y-range:', yr);
   // Data is sorted by z
   const zr = { min: drops[0][2], max: drops[drops.length - 1][2] };
-  debug('z-range:', zr);
 
   // Collect all air bubbles
   const bubbles = [];
 
-  // Examine each z-slice
+  // Examine each coordinate in the bounding box
   for (let z = zr.min; z < zr.max; z++)
   {
     for (let x = xr.min; x < xr.max; x++)
     {
       for (let y = yr.min; y < yr.max; y++)
       {
-        const res = enclosed(drops, x, y, z, xr, yr, zr);
-        debug([ x, y, z ], 'is', res ? 'enclosed' : 'not enclosed');
-        if (res)
+        if (enclosed(drops, x, y, z, xr, yr, zr))
         {
           bubbles.push([ x, y, z ]);
         }
@@ -167,15 +127,13 @@ function solve2(drops, part1)
     }
   }
 
-  const surface = solve1(bubbles);
-  debug('enclosed air', bubbles.length, bubbles, 'surface:', surface);
-
-  return part1 - surface;
+  return part1 - solve1(bubbles);
 }
 
 export default async function day18(target)
 {
   const start = Date.now();
+  debug('starting');
 
   const content = await fs.readFile(target);
 
@@ -187,56 +145,7 @@ export default async function day18(target)
     .map(v => v.split(/\s*,\s*/).map(w => parseInt(w, 10)))
     .sort((a, b) => a[2] - b[2]);
 
-  debug('droplets:', droplets);
-
   const part1 = solve1(droplets);
-
-  /*
-  const cube4x4x4 = [
-    // Base layer
-    [ 2, 2, 1 ],
-    [ 3, 2, 1 ],
-
-    [ 2, 3, 1 ],
-    [ 3, 3, 1 ],
-
-    // Layer 1
-    [ 2, 1, 2 ],
-    [ 3, 1, 2 ],
-
-    [ 1, 2, 2 ],
-    [ 4, 2, 2 ],
-
-    [ 1, 3, 2 ],
-    [ 4, 3, 2 ],
-
-    [ 2, 4, 2 ],
-    [ 3, 4, 2 ],
-
-    // Layer 2
-    [ 2, 1, 3 ],
-    [ 3, 1, 3 ],
-
-    [ 1, 2, 3 ],
-    [ 4, 2, 3 ],
-
-    [ 1, 3, 3 ],
-    [ 4, 3, 3 ],
-
-    [ 2, 4, 3 ],
-    [ 3, 4, 3 ],
-
-    // Top layer
-    [ 2, 2, 4 ],
-    [ 3, 2, 4 ],
-
-    [ 2, 3, 4 ],
-    [ 3, 3, 4 ]
-  ];
-
-  doDebug = true;
-  const part2 = solve2(cube4x4x4, 0);
-  */
 
   const part2 = solve2(droplets, part1);
 
