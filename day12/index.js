@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises';
+import PriorityQueue from '../lib/priorityqueue.js';
 
 let doDebug = false;
 if (process.argv[2])
@@ -29,13 +30,6 @@ function neighbors(data, x, y, reverse = false)
       ));
 }
 
-function popCheapest(heap)
-{
-  // pop the item on the heap with the lowest cost and return it
-  const min = Math.min(...heap.map(v => v.cost));
-  return heap.splice(heap.findIndex(v => v.cost === min), 1).pop();
-}
-
 function solve(data, start, end, reverse = false)
 {
   const path = [];
@@ -55,7 +49,7 @@ function solve(data, start, end, reverse = false)
   // - Check if we reached the destination
   // - If not, add all neighbors on the priority queue
   //
-  const heap = [];
+  const heap = new PriorityQueue(v => v.cost);
   heap.push({ cost: 0, loc: start });
   const visited = {};
 
@@ -65,7 +59,7 @@ function solve(data, start, end, reverse = false)
     {
       throw new Error('No more open paths! Unable to reach end point!');
     }
-    const { cost, loc } = popCheapest(heap);
+    const { cost, loc } = heap.shift();
 
     const key = `${loc.x},${loc.y}`;
     if (key in visited) { continue; }
