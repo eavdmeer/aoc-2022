@@ -14,45 +14,7 @@ function debug(...args)
   console.log(...args);
 }
 
-/*
-function maxflow(nodes, node, opened, remaining)
-{
-  debug('check node', node.id, 'remaining', remaining, 'opened', opened);
-  if (remaining <= 0) { return 0; }
-  const getNode = id => nodes.find(v => v.id === id);
-
-  let best = 0;
-  if (! (node.id in opened))
-  {
-    const val = (remaining - 1) * node.flow;
-    node.to.forEach(id =>
-    {
-      const n = getNode(id);
-      if (val)
-      {
-        debug('open', id, 'val', val);
-        const nopened = { ...opened };
-        nopened[node.id] = true;
-        best = Math.max(best,
-          val + maxflow(nodes, n, nopened, remaining - 2));
-
-      }
-      best = Math.max(best, maxflow(nodes, n, opened, remaining - 1));
-    });
-  }
-  debug('returning', best);
-  return best;
-}
-*/
-
-function makeKey(time, valve, opened)
-{
-  return `${time}-${valve}-${Object.keys(opened).join('-')}`;
-}
-
-let fromCache = 0;
-
-function dfs(valves, valveId, time, volume, cache, opened)
+function dfs(valves, valveId, time, volume, opened)
 {
   const db = (...args) => debug(time, '-', ...args);
   const findValve = id => valves.find(v => v.id === id);
@@ -69,14 +31,6 @@ function dfs(valves, valveId, time, volume, cache, opened)
   {
     db('all valves are already open');
     return volume;
-  }
-
-  const key = makeKey(valveId, time, opened);
-  if (key in cache)
-  {
-    db('returning from cache');
-    fromCache++;
-    return cache[key];
   }
 
   const valve = findValve(valveId);
@@ -99,17 +53,21 @@ function dfs(valves, valveId, time, volume, cache, opened)
     .map(([ vid, dist ]) =>
     {
       const ntime = time - dist - (valveId === 'AA' ? 0 : 1);
+      if (ntime < 1)
+      {
+        db('skipping node', vid, 'as there is no time to open it');
+        return 0;
+      }
       const nopened = { ...opened };
       db('jumping to node', vid, 'from', valveId, 'at time', ntime,
         'to open valve at dist', dist);
 
-      return dfs(valves, vid, ntime, nvolume, cache, nopened);
+      return dfs(valves, vid, ntime, nvolume, nopened);
     });
 
   nvolume = Math.max(nvolume, ...results);
 
-  db('storing cache for key', key, nvolume);
-  cache[key] = nvolume;
+  db('Best value for', valveId, 'is', nvolume);
 
   return nvolume;
 }
@@ -141,9 +99,7 @@ function solve(valves, start, duration = 30)
   });
   debug('valves with distances', withFlow);
 
-  fromCache = 0;
-  const val = dfs(withFlow, start, duration, 0, {}, {});
-  debug('from cache:', fromCache);
+  const val = dfs(withFlow, start, duration, 0, {});
 
   return val;
 }
