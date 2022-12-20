@@ -13,11 +13,11 @@ target="day$day"
 mkdir -p "$target" || exit 1
 
 sarg="s/dayxx/day$day/; s/day: -1/day: $day/"
-sed "$sarg" "$here/index.js" > "$target/index.js"
+sed "$sarg" "$here/skel/index.js" > "$target/index.js"
 touch "$target/example.txt" "$target/data.txt"
 
-cd "$target"
-git add index.js example.txt date.txt
+git add "$target/index.js" "$target/example.txt" "$target/data.txt"
 
+cd "$target" || exit 1
 gvim example.txt data.txt
 gvim index.js
