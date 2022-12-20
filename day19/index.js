@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 
-const MAXT = 24;
 const materials = [ 'ore', 'clay', 'obsidian', 'geode' ];
 
 let doDebug = false;
@@ -118,7 +117,7 @@ function dfs(blueprint, maxSpend, cache, time, robots, mined)
   return max;
 }
 
-function solveBlueprint(blueprint)
+function solveBlueprint(blueprint, duration)
 {
   // Find maximum number of robots to build of each type
   const maxSpend = { ore: 0, clay: 0, obsidian: 0, geode: 10000000 };
@@ -128,7 +127,7 @@ function solveBlueprint(blueprint)
 
   debug('maxSpend', maxSpend);
 
-  const time = MAXT;
+  const time = duration;
   const cache = {};
   const robots = { ore: 1, clay: 0, obsidian: 0, geode: 0 };
   const mined = { ore: 0, clay: 0, obsidian: 0, geode: 0 };
@@ -142,12 +141,24 @@ function solveBlueprint(blueprint)
 function solve1(data)
 {
   const scores = Object.entries(data)
-    .map(([ k, v ]) => [ k, solveBlueprint(v) ])
+    .map(([ k, v ]) => [ k, solveBlueprint(v, 24) ])
     .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
   debug(scores);
 
   return Object.entries(scores).reduce((a, [ k, v ]) =>
     a + parseInt(k, 10) * v, 0);
+}
+
+function solve2(data)
+{
+  const scores = Object.entries(data)
+    .slice(0, 3)
+    .map(([ k, v ]) => [ k, solveBlueprint(v, 32) ])
+    .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
+  debug(scores);
+  console.log(scores);
+
+  return Object.entries(scores).reduce((a, v) => a * v[1], 1);
 }
 
 export default async function day19(target)
@@ -186,7 +197,7 @@ export default async function day19(target)
   doDebug = false;
   const part1 = solve1(blueprints);
 
-  const part2 = 'todo';
+  const part2 = solve2(blueprints);
 
   return { day: 19, part1, part2, duration: Date.now() - start };
 }
