@@ -94,7 +94,6 @@ function solve1(data, scale = 1, runs = 1)
 
   for (let i = 0; i < runs; i++) { nodes.forEach(n => n.move()); }
 
-  doDebug = true;
   const zero = nodes.find(v => v.value === 0);
   const vals = [ 1000, 2000, 3000 ].map(idx =>
   {
