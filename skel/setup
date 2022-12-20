@@ -1,0 +1,23 @@
+#!/bin/bash
+
+day="${1-}"
+here="${0%/*}"
+
+[ -n "$day" ] || {
+  echo >&2 "Usage: ${0##*/} day"
+  exit 1
+}
+echo "Setting up for day $day..."
+target="day$day"
+
+mkdir -p "$target" || exit 1
+
+sarg="s/dayxx/day$day/; s/day: -1/day: $day/"
+sed "$sarg" "$here/index.js" > "$target/index.js"
+touch "$target/example.txt" "$target/data.txt"
+
+cd "$target"
+git add index.js example.txt date.txt
+
+gvim example.txt data.txt
+gvim index.js
