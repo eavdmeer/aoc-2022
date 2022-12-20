@@ -82,17 +82,17 @@ Node.prototype.toString = function()
   return parts.join(', ');
 };
 
-function solve1(data)
+function solve1(data, scale = 1, runs = 1)
 {
   const len = data.length;
-  const nodes = data.map(v => new Node(v, len));
+  const nodes = data.map(v => new Node(scale * v, len));
   nodes.forEach((n, i, a) =>
   {
     n.left = a[i - 1 < 0 ? i - 1 + a.length : i - 1];
     n.right = a[(i + 1) % a.length];
   });
 
-  nodes.forEach(n => n.move());
+  for (let i = 0; i < runs; i++) { nodes.forEach(n => n.move()); }
 
   doDebug = true;
   const zero = nodes.find(v => v.value === 0);
@@ -106,11 +106,6 @@ function solve1(data)
   debug('vals:', vals, 'answer:', answer);
 
   return answer;
-}
-
-function solve2()
-{
-  return 'todo';
 }
 
 export default async function day20(target)
@@ -133,7 +128,7 @@ export default async function day20(target)
 
   const part1 = solve1(data);
 
-  const part2 = solve2(data);
+  const part2 = solve1(data, 811589153, 10);
 
   return { day: 20, part1, part2, duration: Date.now() - start };
 }
