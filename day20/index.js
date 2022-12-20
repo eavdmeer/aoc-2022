@@ -21,31 +21,91 @@ function debug(...args)
   console.log(...args);
 }
 
+function Node(value, len)
+{
+  this.value = value;
+  this.len = len;
+  this.right = undefined;
+  this.left = undefined;
+}
+Node.prototype.move = function()
+{
+  if (this.value === 0) { return; }
+  /* eslint-disable-next-line consistent-this */
+  let node = this;
+  for (let i = 0; i < Math.abs(this.value) % (this.len - 1); i++)
+  {
+    node = this.value > 0 ? node.right : node.left;
+  }
+  this.unlink();
+  if (this.value > 0)
+  {
+    node.append(this);
+  }
+  else
+  {
+    node.insert(this);
+  }
+};
+Node.prototype.append = function(node)
+{
+  node.right = this.right;
+  node.left = this;
+
+  this.right.left = node;
+  this.right = node;
+};
+Node.prototype.insert = function(node)
+{
+  node.left = this.left;
+  node.right = this;
+
+  this.left.right = node;
+  this.left = node;
+};
+Node.prototype.unlink = function()
+{
+  this.left.right = this.right;
+  this.right.left = this.left;
+};
+Node.prototype.toString = function()
+{
+  /* eslint-disable-next-line */
+  let n = this;
+  const parts = [];
+  do
+  {
+    parts.push(n.value);
+    n = n?.right;
+  } while (n && n !== this);
+
+  return parts.join(', ');
+};
+
 function solve1(data)
 {
-  const result = data.slice();
   const len = data.length;
-  const locations = data.map((v, i) => i);
-  debug('locations', locations);
-
-  debug('initial arrangement');
-  debug(result.join(', '));
-  data.forEach(v =>
+  const nodes = data.map(v => new Node(v, len));
+  nodes.forEach((n, i, a) =>
   {
-    // Find first occurrence
-    const idx = result.indexOf(v);
-    // Take it out
-    result.splice(idx, 1);
-    const nidx = idx + v <= 0 ?
-      idx + v + len - 1 :
-      idx + v > len - 1 ?
-        1 + (idx + v) % len :
-        idx + v;
-    debug('moving', v, 'to new index', nidx);
-    result.splice(nidx, 0, v);
-    debug(result.join(', '));
+    n.left = a[i - 1 < 0 ? i - 1 + a.length : i - 1];
+    n.right = a[(i + 1) % a.length];
   });
-  return 'todo';
+
+  nodes.forEach(n => n.move());
+
+  doDebug = true;
+  const zero = nodes.find(v => v.value === 0);
+  const vals = [ 1000, 2000, 3000 ].map(idx =>
+  {
+    let n = zero;
+    for (let i = 0; i < idx % len; i++) { n = n.right; }
+    return n?.value;
+  });
+  const answer = vals.reduce((a, v) => a + v, 0);
+  debug('vals:', vals, 'answer:', answer);
+
+  return answer;
 }
 
 function solve2()
