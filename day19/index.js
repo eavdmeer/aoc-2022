@@ -22,7 +22,7 @@ function makeKey(time, robots, mined)
 }
 
 let fromCache = 0;
-const optimizations = { cache: false, truncate: false };
+const optimizations = { cache: true, truncate: true };
 
 function dfs(blueprint, maxSpend, cache, time, robots, mined)
 {
