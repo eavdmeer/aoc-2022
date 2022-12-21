@@ -189,7 +189,10 @@ function solve2(data)
 
   const n = [];
   matrix.forEach(row => n.push(row.pop()));
+  debug('matrix for solver:', matrix);
+  debug('solve with:', n);
   const solution = linear.solve(matrix, n);
+  debug('solution;', solution);
   const idx = unknown.indexOf('humn');
 
   return solution[idx];
@@ -215,9 +218,7 @@ export default async function day21(target)
 
   debug('data', data);
 
-  doDebug = false;
   const part1 = solve1(data);
-  doDebug = true;
 
   const part2 = solve2(data);
 
