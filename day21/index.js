@@ -257,9 +257,8 @@ export default async function day21(target)
 
   debug('data', data);
 
-  const part1 = solve1(data, 2);
+  const part1 = solve1(data, 1);
 
-  doDebug = false;
   const part2 = solve2(data);
 
   return { day: 21, part1, part2, duration: Date.now() - start };
