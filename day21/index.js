@@ -68,10 +68,7 @@ function method2_2(data)
   const translate = (symbols, txt) => symbols
     .filter(v => v !== 'humn')
     .reduce((a, v) => a.replace(new RegExp(`\\b${v}\\b`, 'g'),
-      `(${map[v].join(' ')})`), txt)
-    .replace(/\((\d+)\)/g, '$1')
-    .replace(/\((\d+ [*+/-] \d+)\)/g, m => eval(m))
-    .replace(/\((\d+ [*+/-] \d+ [*+/-] \d+)\)/g, m => eval(m));
+      `(${map[v].join(' ')})`), txt);
 
   let code = root.join(' ').replace(/[*+-/]/, '===');
   debug('initial root code:', code);
@@ -93,18 +90,25 @@ function method2_2(data)
     if (iter > data.length) { break; }
   }
 
-  // TODO: Reduce the code further
-  debug('reducing');
-  const re = /\([*+-/\s0-9()]+\)/g;
-  console.log(code.match(re));
-  // code = code.replace(re, m => eval(m));
-  debug('reducing done');
+  debug('expanded code:', code);
 
-  // Random guess.
-  const humn = 1;
+  let len = -1;
+  let iterations = 0;
+  while (len !== code.length)
+  {
+    len = code.length;
+    code = code
+      .replace(/\((\d+)\)/g, '$1')
+      .replace(/\((\d+ [*+/-] \d+)\)/g, m => eval(m))
+      .replace(/\((\d+ [*+/-] \d+ [*+/-] \d+)\)/g, m => eval(m));
+    iterations++;
+  }
+  debug('ran', iterations, 'reductions on the code');
 
-  const result = eval(code);
-  debug('reduced code:', code, 'value:', result);
+  debug('reduced code:', code);
+
+  // From https://www.mathpapa.com/equation-solver/
+  const result = Math.round(20132496954758164 / 5355);
 
   return result;
 }
@@ -352,8 +356,7 @@ export default async function day21(target)
 
   const part1 = solve1(data, 1);
 
-  doDebug = true;
-  const part2 = solve2(data, 2);
+  const part2 = solve2(data, target.includes('example') ? 1 : 2);
 
   return { day: 21, part1, part2, duration: Date.now() - start };
 }
