@@ -14,8 +14,48 @@ function debug(...args)
   console.log(...args);
 }
 
-function solve1(data)
+function method2(data)
 {
+  const map = data
+    .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
+
+  const root = map.root.slice();
+  debug(root);
+
+  const reduced = code => /^[*+-/\s0-9()]+$/.test(code);
+
+  const translate = (symbols, txt) =>
+    symbols.reduce((a, v) => a.replace(new RegExp(`\\b${v}\\b`, 'g'),
+      `(${map[v].join(' ')})`), txt);
+
+  let code = root.join(' ');
+  debug(code, reduced(code));
+  let iter = 1;
+  while (! reduced(code))
+  {
+    const symbols = code.match(/\b[a-z]{4}\b/g);
+    debug('symbols', symbols);
+
+    code = translate(symbols, code);
+
+    debug('iteration', iter, code, 'reduced:', reduced(code));
+    iter++;
+    if (iter > data.length) { break; }
+  }
+  if (! reduced(code)) { throw new Error('Failed to reduce code!'); }
+
+  /* eslint-disable-next-line no-eval */
+  const result = eval(code);
+  debug('reduced code:', code, 'value:', result);
+
+  return result;
+}
+function solve1(data, method = 1)
+{
+  if (method === 2)
+  {
+    return method2(data);
+  }
   const values = data
     .filter(v => ! isNaN(v[1]))
     .map(v => [ v[0], parseInt(v[1], 10) ])
@@ -213,13 +253,13 @@ export default async function day21(target)
     .filter(v => v)
     .map(v => v.split(/\s*:\s*/))
     .map(v => [ v[0], v[1].split(/\s+/) ]);
-
   /* eslint-enable no-shadow */
 
   debug('data', data);
 
-  const part1 = solve1(data);
+  const part1 = solve1(data, 2);
 
+  doDebug = false;
   const part2 = solve2(data);
 
   return { day: 21, part1, part2, duration: Date.now() - start };
