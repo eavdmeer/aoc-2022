@@ -1,0 +1,58 @@
+pppw: (4 + 2 * (5 - 3)) / 4
+cczh: 
+
+
+root: (4 + 2 * (humn - 3)) / 4 === (humn - 3) * 5
+
+
+ [ 'cczh', [ 4, '+', 'lgvd' ] ],
+ [ 'ptdq', [ 'humn', '-', 3 ] ],
+ [ 'pppw', [ 'cczh', '/', 4 ] ],
+ [ 'lgvd', [ 2, '*', 'ptdq' ] ]
+
+[ 'cczh', '/', 4 ] = 150
+
+
+
+  final values {
+  dbpl: 5,
+  zczc: 2,
+  dvpt: 3,
+  lfqf: 4,
+  ljgn: 2,
+  sllz: 4,
+  hmdt: 32,
+  drzm: 30,
+  sjmn: 150,
+  pppw: 150
+}
+cczh = 4 + lgvd  | cczh      -lgvd           = 4   |  |1  0 -1  0    4|
+ptdq = humn - 3  |      humn          - ptdq = 3   |  |0  1  0 -1    3|
+150 = cczh / 4   | cczh                      = 600 |  |1  0  0  0  600|
+lgvd = 2 * ptdq  |            lgvd  -2*ptdq  = 0   |  |0  0  1 -2    0|
+                  \                               /   
+
+ |1  0 -1  0    4|   
+ |0  1  0 -1    3| 
+ |1  0  0  0  600| 
+ |0  0  1 -2    0|  
+
+subtract row 3 from row 1
+
+ |0  0 -1 0  -596|
+ |0  1  0 -1    3|
+ |0  0  1 -2    0|
+
+add row 1 to row 3
+
+ |0  1  0 -1    3|
+ |0  0  0 -2 -596|
+
+normalize row 3
+
+ |0  1  0 -1    3|
+ |0  0  0  1  298|
+
+add row 1 to row 3
+
+ |0  1  0  0  301|
