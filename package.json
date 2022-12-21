@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/eavdmeer/aoc-2022/issues"
   },
-  "homepage": "https://github.com/eavdmeer/aoc-2022#readme"
+  "homepage": "https://github.com/eavdmeer/aoc-2022#readme",
+  "dependencies": {
+    "linear-solve": "^1.2.1"
+  }
 }
