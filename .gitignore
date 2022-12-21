@@ -1,2 +1,5 @@
+**/nono.*
+**/bla.*
+**/*.log
 **/*.swp
 node_modules
