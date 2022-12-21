@@ -133,7 +133,7 @@ function solve2(data)
   // Get all unknown variables
   const unknown = jobs
     .map(([ l, r ]) => `${l},${r[0]},${r[2]}`).join(',')
-    .match(/[^,]{4}/g)
+    .match(/[^,0-9]{4}/g)
     .filter(v => !(v in values))
     .filter((v, i, a) => a.indexOf(v) === i)
     .sort();
