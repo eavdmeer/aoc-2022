@@ -1,6 +1,8 @@
 import * as fs from 'fs/promises';
 import linear from 'linear-solve';
 
+/* eslint-disable no-eval */
+
 let doDebug = false;
 if (process.argv[2])
 {
@@ -44,12 +46,69 @@ function method2(data)
   }
   if (! reduced(code)) { throw new Error('Failed to reduce code!'); }
 
-  /* eslint-disable-next-line no-eval */
   const result = eval(code);
   debug('reduced code:', code, 'value:', result);
 
   return result;
 }
+
+/* eslint-disable-next-line */
+function method2_2(data)
+{
+  const map = data
+    .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
+
+  delete map.humn;
+
+  const root = map.root;
+  debug(root);
+
+  const reduced = code => /^[*+-/\s0-9()]+$/.test(code);
+
+  const translate = (symbols, txt) => symbols
+    .filter(v => v !== 'humn')
+    .reduce((a, v) => a.replace(new RegExp(`\\b${v}\\b`, 'g'),
+      `(${map[v].join(' ')})`), txt)
+    .replace(/\((\d+)\)/g, '$1')
+    .replace(/\((\d+ [*+/-] \d+)\)/g, m => eval(m))
+    .replace(/\((\d+ [*+/-] \d+ [*+/-] \d+)\)/g, m => eval(m));
+
+  let code = root.join(' ').replace(/[*+-/]/, '===');
+  debug('initial root code:', code);
+
+  let iter = 1;
+  while (! reduced(code))
+  {
+    const symbols = code.match(/\b[a-z]{4}\b/g);
+    // debug('symbols', symbols);
+    if (symbols.length === 1 && symbols[0] === 'humn')
+    {
+      break;
+    }
+
+    code = translate(symbols, code);
+
+    // debug('iteration', iter, code, 'reduced:', reduced(code));
+    iter++;
+    if (iter > data.length) { break; }
+  }
+
+  // TODO: Reduce the code further
+  debug('reducing');
+  const re = /\([*+-/\s0-9()]+\)/g;
+  console.log(code.match(re));
+  // code = code.replace(re, m => eval(m));
+  debug('reducing done');
+
+  // Random guess.
+  const humn = 1;
+
+  const result = eval(code);
+  debug('reduced code:', code, 'value:', result);
+
+  return result;
+}
+
 function solve1(data, method = 1)
 {
   if (method === 2)
@@ -74,7 +133,6 @@ function solve1(data, method = 1)
   while (! ('root' in values))
   {
     // Find all jobs that are ready to be calculated
-    /* eslint-disable no-eval */
     const ready = jobs
       .map((v, i) => [ i, v[0], v[1] ])
       .filter(reduced);
@@ -106,8 +164,12 @@ function solve1(data, method = 1)
   return values.root;
 }
 
-function solve2(data)
+function solve2(data, method = 1)
 {
+  if (method === 2)
+  {
+    return method2_2(data);
+  }
   const values = data
     .filter(v => v[0] !== 'humn' && v[0] !== 'root')
     .filter(v => ! isNaN(v[1]) && v[0] !== 'humn' && v[0] !== 'root')
@@ -231,8 +293,39 @@ function solve2(data)
   matrix.forEach(row => n.push(row.pop()));
   debug('matrix for solver:', matrix);
   debug('solve with:', n);
+
+  const bad = matrix.findIndex(row => row.length !== n.length);
+  if (bad !== -1)
+  {
+    throw new Error(`invalid data for linear solve in row ${bad}!`);
+  }
   const solution = linear.solve(matrix, n);
-  debug('solution;', solution);
+  debug('solution;', solution.map((v, i) => `${unknown[i]}: ${v}`));
+
+  // Update our values
+  solution.forEach((v, i) => values[i] = v);
+
+  // Verify with the original equations
+  const translate = (symbols, txt) =>
+    symbols.reduce((a, v) => a.replace(new RegExp(`\\b${v}\\b`, 'g'),
+      `${values[v] || 'ERR'}`), txt);
+
+  console.log('xxxx',
+    data
+      .filter(v => v[0] !== 'humn' && v[0] !== 'root')
+      .filter(v => v[1].length > 1)
+      .map(([ l, r ]) =>
+      {
+        const code = `${l} === ${r.join(' ')}`;
+        const symbols = code.match(/\b[a-z]{4}\b/g);
+        return translate(symbols, code);
+      })
+      .map(code => ({ code,
+        good: code.includes('ERR') ? false : eval(code) }))
+      .filter(v => ! v.good)
+  );
+
+
   const idx = unknown.indexOf('humn');
 
   return solution[idx];
@@ -259,7 +352,8 @@ export default async function day21(target)
 
   const part1 = solve1(data, 1);
 
-  const part2 = solve2(data);
+  doDebug = true;
+  const part2 = solve2(data, 2);
 
   return { day: 21, part1, part2, duration: Date.now() - start };
 }
