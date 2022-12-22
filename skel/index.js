@@ -41,8 +41,16 @@ export default async function dayxx(target)
   debug('data', data);
 
   const part1 = solve1(data);
+  if (target.includes('example') && part1 !== 'todo')
+  {
+    throw new Error(`Invalid solution: ${part1}. Expecting; 'todo'`);
+  }
 
   const part2 = solve2(data);
+  if (target.includes('example') && part2 !== 'todo')
+  {
+    throw new Error(`Invalid solution: ${part1}. Expecting; 'todo'`);
+  }
 
   return { day: -1, part1, part2, duration: Date.now() - start };
 }
