@@ -22,6 +22,9 @@ const rotate = {
   l: v => { [ v.x, v.y ] = [ v.y, -v.x ]; return v; }
 };
 
+// JavaScript % operator is kinda weird. -2 % 10 => -2
+const posmod = (v, n) => (v % n + n) % n;
+
 const score = (pos, vector) =>
 {
   /*
@@ -78,8 +81,8 @@ function solve1M2(grid, moves)
       let nc = c;
       while (true)
       {
-        nr = (nr + dr) % height;
-        nc = (nc + dc) % width;
+        nr = posmod(nr + dr, height);
+        nc = posmod(nc + dc, width);
         if (grid[nr].charAt(nc) !== ' ') { break; }
       }
       if (grid[nr].charAt(nc) === '#') { break; }
@@ -183,6 +186,7 @@ export default async function day22(target)
 
   debug('data', data);
 
+  doDebug = true;
   const part1 = solve1(data, instructions, 2);
   if (target.includes('example') && part1 !== 6032)
   {
