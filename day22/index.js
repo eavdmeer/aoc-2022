@@ -18,8 +18,8 @@ function debug(...args)
 }
 
 const rotate = {
-  r: v => { const t = v.x; v.x = -v.y; v.y = t; return v; },
-  l: v => { const t = v.x; v.x = v.y; v.y = -t; return v; }
+  r: v => { [ v.x, v.y ] = [ -v.y, v.x ]; return v; },
+  l: v => { [ v.x, v.y ] = [ v.y, -v.x ]; return v; }
 };
 
 const score = (pos, vector) =>
@@ -68,8 +68,8 @@ function solve1M2(grid, moves)
   {
     if (isNaN(move))
     {
-      if (move === 'r') { const t = dr; dr = dc; dc = -t; }
-      if (move === 'l') { const t = dr; dr = -dc; dc = t; }
+      if (move === 'r') { [ dr, dc ] = [ dc, -dr ]; }
+      if (move === 'l') { [ dr, dc ] = [ -dc, dr ]; }
       return;
     }
     for (let i = 0; i < move; i++)
@@ -145,8 +145,21 @@ function solve1(board, moves, method = 1)
   return score(pos, vector);
 }
 
-function solve2()
+function solve2(grid)
 {
+  // Get cube dimensions
+  const shape = [];
+  grid.forEach(v =>
+  {
+    if (v.trim().length !== shape[shape.length - 1])
+    {
+      shape.push(v.trim().length);
+    }
+  });
+  const cubeSize = gcd(...shape);
+  debug('cube characteristics: size:', cubeSize, 'shape:', shape);
+
+
   return 'todo';
 }
 
