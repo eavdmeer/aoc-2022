@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import { gcd } from '../lib/lcm.js';
 
 /* eslint max-statements-per-line: ["error", { "max": 4 }] */
+/* eslint-disable no-constant-condition */
 
 let doDebug = false;
 if (process.argv[2])
@@ -48,8 +49,52 @@ const score = (pos, vector) =>
   return 1000 * (pos.y + 1) + 4 * (pos.x + 1) + vscore(vector);
 };
 
-function solve1(board, moves)
+function solve1M2(grid, moves)
 {
+  let c = 0;
+  let r = 0;
+  let dr = 0;
+  let dc = 1;
+
+  const width = Math.max(...grid.map(v => v.length));
+  const height = grid.length;
+
+  grid.forEach((row, i) => grid[i] = row.padEnd(width));
+
+  while (grid[r].charAt(c) !== '.') { c++; }
+  debug('starting in', c, r);
+
+  moves.forEach(move =>
+  {
+    if (isNaN(move))
+    {
+      if (move === 'r') { const t = dr; dr = dc; dc = -t; }
+      if (move === 'l') { const t = dr; dr = -dc; dc = t; }
+      return;
+    }
+    for (let i = 0; i < move; i++)
+    {
+      let nr = r;
+      let nc = c;
+      while (true)
+      {
+        nr = (nr + dr) % height;
+        nc = (nc + dc) % width;
+        if (grid[nr].charAt(nc) !== ' ') { break; }
+      }
+      if (grid[nr].charAt(nc) === '#') { break; }
+      c = nc;
+      r = nr;
+    }
+  });
+  debug('ending in', c, r);
+
+  return score({ x: c, y: r }, { x: dc, y: dr });
+}
+
+function solve1(board, moves, method = 1)
+{
+  if (method === 2) { return solve1M2(board, moves); }
   // Initial position
   const pos = { x: board[0].indexOf('.'), y: 0 };
   debug('pos:', pos);
@@ -100,93 +145,8 @@ function solve1(board, moves)
   return score(pos, vector);
 }
 
-function solve2(board, moves)
+function solve2()
 {
-  // Initial position
-  const pos = { x: board[0].indexOf('.'), y: 0 };
-  debug('pos:', pos);
-
-  // Initial vector
-  const vector = { x: 1, y: 0 };
-  debug('vector:', vector);
-
-  const width = board.reduce((a, v) => v.length > a ? v.length : a, 0);
-  const height = board.length;
-  debug('width:', width, 'height:', height);
-
-  // Detect cube size
-  const cubeSize = gcd(...board
-    .map(v => v.trim().length)
-    .filter((v, i, a) => a.indexOf(v) === i));
-  debug('cube size is:', cubeSize);
-
-  moves.forEach(m =>
-  {
-    debug('move', m, 'pos:', pos, 'vector:', vector);
-    if (isNaN(m)) { rotate[m](vector); }
-    else
-    {
-      for (let i = 0; i < m; i++)
-      {
-        debug('  step', i + 1, 'pos:', pos, 'vector:', vector);
-        const np = {
-          x: pos.x + vector.x,
-          y: pos.y + vector.y
-        };
-        let ch = board[np.y]?.charAt(np.x);
-        debug('   new pos:', np, 'char:', JSON.stringify(ch));
-
-        // handle overflow
-        if (ch === ' ' || ch === '' || ch === undefined)
-        {
-          debug('   off the grid');
-          // We walked off grid
-          if (vector.y > 0)
-          {
-            let p = board[np.y - 1]?.charAt(np.x);
-            while (p && p !== ' ')
-            {
-              np.y--;
-              p = board[np.y - 1]?.charAt(np.x);
-            }
-            debug('   corrected to top edge', np);
-          }
-          else if (vector.y < 0)
-          {
-            let p = board[np.y + 1]?.[np.x];
-            while (p && p !== ' ')
-            {
-              np.y++;
-              p = board[np.y + 1]?.[np.x];
-            }
-            debug('   corrected to bottom edge', np);
-          }
-          else if (vector.x > 0)
-          {
-            np.x = board[np.y].search(/[^ ]/);
-            debug('   corrected to left edge', np);
-          }
-          else if (vector.x < 0)
-          {
-            np.x = board[np.y].length - 1;
-            debug('   corrected to right edge', np);
-          }
-        }
-        if (np.x < 0 || np.y < 0 ||
-          np.x >= width || np.y >= height ||
-          np.x >= board[np.y].width ||
-          board[np.y]?.charAt(np.x) === ' ')
-        {
-          throw new Error(`off the board: ${np.x}, ${np.y}`);
-        }
-        ch = board[np.y]?.charAt(np.x);
-        debug('   char at np is', ch);
-        if (ch === '#') { debug('   blocked at', np); break; }
-        pos.x = np.x; pos.y = np.y;
-      }
-    }
-  });
-  debug('all moves done', pos);
   return 'todo';
 }
 
@@ -210,14 +170,12 @@ export default async function day22(target)
 
   debug('data', data);
 
-  // doDebug = false;
-  const part1 = solve1(data, instructions);
+  const part1 = solve1(data, instructions, 2);
   if (target.includes('example') && part1 !== 6032)
   {
     throw new Error(`Invalid solution: ${part1}. Expecting; 6032`);
   }
 
-  doDebug = process.argv[2].includes('example');
   const part2 = solve2(data, instructions);
   if (target.includes('example') && part2 !== 'todo')
   {
