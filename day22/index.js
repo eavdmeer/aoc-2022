@@ -148,7 +148,7 @@ function solve1(board, moves, method = 1)
   return score(pos, vector);
 }
 
-function solve2(grid)
+function solve2(grid, moves)
 {
   // Get cube dimensions
   const shape = [];
@@ -162,8 +162,141 @@ function solve2(grid)
   const cubeSize = gcd(...shape);
   debug('cube characteristics: size:', cubeSize, 'shape:', shape);
 
+  let c = 0;
+  let r = 0;
+  let dr = 0;
+  let dc = 1;
 
-  return 'todo';
+  const width = Math.max(...grid.map(v => v.length));
+
+  grid.forEach((row, i) => grid[i] = row.padEnd(width));
+
+  while (grid[r].charAt(c) !== '.') { c++; }
+  debug('starting in', c, r);
+
+  moves.forEach(move =>
+  {
+    if (isNaN(move))
+    {
+      console.log('at', c, r, 'rotate', move.toUpperCase());
+      if (move === 'r') { [ dr, dc ] = [ dc, -dr ]; }
+      if (move === 'l') { [ dr, dc ] = [ -dc, dr ]; }
+      return;
+    }
+    for (let i = 0; i < move; i++)
+    {
+      console.log('from', c, r, 'move', dc, dr, 'steps:', move);
+
+      // New location
+      let nc = c + dc;
+      let nr = r + dr;
+
+      console.log('    try new location', nc, nr);
+
+      // Possibly new direction
+      let ndc = dc;
+      let ndr = dr;
+
+      if (nr < 0 && nc >= 50 <= nc < 100 && ndr === -1)
+      {
+        console.log('case-a');
+        [ ndr, ndc ] = [ 0, 1 ];
+        [ nr, nc ] = [ nc + 100, 0 ];
+      }
+      else if (nc < 0 && nr >= 150 <= nr < 200 && ndc === -1)
+      {
+        console.log('case-b');
+        [ ndr, ndc ] = [ 1, 0 ];
+        [ nr, nc ] = [ 0, nr - 100 ];
+      }
+      else if (nr < 0 && nc >= 100 <= nc < 150 && ndr === -1)
+      {
+        console.log('case-c');
+        [ nr, nc ] = [ 199, nc - 100 ];
+      }
+      else if (nr >= 200 && nc >= 0 <= nc < 50 && ndr === 1)
+      {
+        console.log('case-d');
+        [ nr, nc ] = [ 0, nc + 100 ];
+      }
+      else if (nc >= 150 && nr >= 0 <= nr < 50 && ndc === 1)
+      {
+        console.log('case-e');
+        ndc = -1;
+        [ nr, nc ] = [ 149 - nr, 99 ];
+      }
+      else if (nc === 100 && nr >= 100 <= nr < 150 && ndc === 1)
+      {
+        console.log('case-f');
+        ndc = -1;
+        [ nr, nc ] = [ 149 - nr, 149 ];
+      }
+      else if (nr === 50 && nc >= 100 <= nc < 150 && ndr === 1)
+      {
+        console.log('case-g');
+        [ ndr, ndc ] = [ 0, -1 ];
+        [ nr, nc ] = [ nc - 50, 99 ];
+      }
+      else if (nc === 100 && nr >= 50 <= nr < 100 && ndc === 1)
+      {
+        console.log('case-h');
+        [ ndr, ndc ] = [ -1, 0 ];
+        [ nr, nc ] = [ 49, nr + 50 ];
+      }
+      else if (nr === 150 && nc >= 50 <= nc < 100 && ndr === 1)
+      {
+        console.log('case-i');
+        [ ndr, ndc ] = [ 0, -1 ];
+        [ nr, nc ] = [ nc + 100, 49 ];
+      }
+      else if (nc === 50 && nr >= 150 <= nr < 200 && ndc === 1)
+      {
+        console.log('case-j');
+        [ ndr, ndc ] = [ -1, 0 ];
+        [ nr, nc ] = [ 149, nr - 100 ];
+      }
+      else if (nr === 99 && nc >= 0 <= nc < 50 && ndr === -1)
+      {
+        console.log('case-k');
+        [ ndr, ndc ] = [ 0, 1 ];
+        [ nr, nc ] = [ nc + 50, 50 ];
+      }
+      else if (nc === 49 && nr >= 50 <= nr < 100 && ndc === -1)
+      {
+        console.log('case-l');
+        [ ndr, ndc ] = [ 1, 0 ];
+        [ nr, nc ] = [ 100, nr - 50 ];
+      }
+      else if (nc === 49 && nr >= 0 <= nr < 50 && ndc === -1)
+      {
+        console.log('case-m');
+        ndc = 1;
+        [ nr, nc ] = [ 149 - nr, 0 ];
+      }
+      else if (nc < 0 && nr >= 100 <= nr < 150 && ndc === -1)
+      {
+        console.log('case-n');
+        ndc = 1;
+        [ nr, nc ] = [ 149 - nr, 50 ];
+      }
+
+      if (grid[nr].charAt(nc) === '#')
+      {
+        console.log('    blocked');
+        break;
+      }
+
+      // Use new prosition and direction
+      c = nc;
+      r = nr;
+      dc = ndc;
+      dr = ndr;
+      console.log('    final:', c, r, 'dir:', dc, dr);
+    }
+  });
+  debug('ending in', c, r);
+
+  return score({ x: c, y: r }, { x: dc, y: dr });
 }
 
 export default async function day22(target)
@@ -186,7 +319,6 @@ export default async function day22(target)
 
   debug('data', data);
 
-  doDebug = true;
   const part1 = solve1(data, instructions, 2);
   if (target.includes('example') && part1 !== 6032)
   {
@@ -194,7 +326,8 @@ export default async function day22(target)
   }
 
   // This solution will not work on the example!
-  const part2 = target.includes('example') ? 'todo' :
+  doDebug = true;
+  const part2 = target.includes('a') ? 'todo' :
     solve2(data, instructions);
   if (target.includes('example') && part2 !== 'todo')
   {
