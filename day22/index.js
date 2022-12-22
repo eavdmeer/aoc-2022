@@ -64,66 +64,33 @@ function solve1(board, moves)
 
   moves.forEach(m =>
   {
-    debug('move', m, 'pos:', pos, 'vector:', vector);
     if (isNaN(m)) { rotate[m](vector); }
     else
     {
       for (let i = 0; i < m; i++)
       {
-        debug('  step', i + 1, 'pos:', pos, 'vector:', vector);
-        const np = {
-          x: pos.x + vector.x,
-          y: pos.y + vector.y
-        };
-        let ch = board[np.y]?.charAt(np.x);
-        debug('   new pos:', np, 'char:', JSON.stringify(ch));
+        const np = { x: pos.x + vector.x, y: pos.y + vector.y };
 
         // handle overflow
+        const ch = board[np.y]?.charAt(np.x);
         if (ch === ' ' || ch === '' || ch === undefined)
         {
-          debug('   off the grid');
-          // We walked off grid
-          if (vector.y > 0)
+          const search = {
+            x: vector.x === 0 ? 0 : vector.x > 0 ? -1 : 1,
+            y: vector.y === 0 ? 0 : vector.y > 0 ? -1 : 1
+          };
+          let p = board[np.y + search.y]?.charAt(np.x + search.x);
+          while (p && p !== ' ')
           {
-            let p = board[np.y - 1]?.charAt(np.x);
-            while (p && p !== ' ')
-            {
-              np.y--;
-              p = board[np.y - 1]?.charAt(np.x);
-            }
-            debug('   corrected to top edge', np);
-          }
-          else if (vector.y < 0)
-          {
-            let p = board[np.y + 1]?.[np.x];
-            while (p && p !== ' ')
-            {
-              np.y++;
-              p = board[np.y + 1]?.[np.x];
-            }
-            debug('   corrected to bottom edge', np);
-          }
-          else if (vector.x > 0)
-          {
-            np.x = board[np.y].search(/[^ ]/);
-            debug('   corrected to left edge', np);
-          }
-          else if (vector.x < 0)
-          {
-            np.x = board[np.y].length - 1;
-            debug('   corrected to right edge', np);
+            debug('char is', JSON.stringify(p), 'keep searching');
+            np.x += search.x;
+            np.y += search.y;
+            p = board[np.y + search.y]?.charAt(np.x + search.x);
           }
         }
-        if (np.x < 0 || np.y < 0 ||
-          np.x >= width || np.y >= height ||
-          np.x >= board[np.y].width ||
-          board[np.y]?.charAt(np.x) === ' ')
-        {
-          throw new Error(`off the board: ${np.x}, ${np.y}`);
-        }
-        ch = board[np.y]?.charAt(np.x);
-        debug('   char at np is', ch);
-        if (ch === '#') { debug('   blocked at', np); break; }
+
+        if (board[np.y]?.charAt(np.x) === '#') { break; }
+
         pos.x = np.x; pos.y = np.y;
       }
     }
@@ -243,7 +210,7 @@ export default async function day22(target)
 
   debug('data', data);
 
-  doDebug = false;
+  // doDebug = false;
   const part1 = solve1(data, instructions);
   if (target.includes('example') && part1 !== 6032)
   {
