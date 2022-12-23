@@ -156,7 +156,6 @@ function solve2(data)
     .map(([ k, v ]) => [ k, solveBlueprint(v, 32) ])
     .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
   debug(scores);
-  console.log(scores);
 
   return Object.entries(scores).reduce((a, v) => a * v[1], 1);
 }
