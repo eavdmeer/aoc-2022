@@ -43,8 +43,6 @@ function solve1(data, rounds = 10)
     });
   });
 
-  debug('grid:', elves);
-
   /*
     No Elf in the N, NE, or NW, propose moving N
     No Elf in the s, SE, or SW, propose moving S
@@ -58,12 +56,9 @@ function solve1(data, rounds = 10)
     [ [ 'E', 'NE', 'SE' ], 'E' ]
   ];
 
-  const expectSize = elves.size;
-
   const max = rounds < 0 ? 100000000 : 10;
   for (let i = 0; i < max; i++)
   {
-    debug('round:', i + 1);
     const proposals = [];
     elves.forEach(elf =>
     {
@@ -73,7 +68,6 @@ function solve1(data, rounds = 10)
       if (Object.values(compass)
         .every(v => ! elves.has(key(x + v[X], y + v[Y]))))
       {
-        debug('no neighbors at all, no proposal');
         return;
       }
 
@@ -84,11 +78,9 @@ function solve1(data, rounds = 10)
         if (dirs.map(v => compass[v])
           .some(v => elves.has(key(x + v[X], y + v[Y]))))
         {
-          debug('elf', elf, dirs.join(','), 'not all free, continuing');
           return false;
         }
         const np = key(x + compass[step][X], y + compass[step][Y]);
-        debug('elf', elf, dirs.join(', '), 'are free, propose', step, 'to', np);
         proposals.push([ elf, np ]);
         return true;
       });
@@ -97,7 +89,6 @@ function solve1(data, rounds = 10)
     // Exit for part2 if there are no more changes
     if (rounds < 0 && proposals.length === 0)
     {
-      console.log('no nore changes after round', i + 1);
       return i + 1;
     }
 
@@ -106,19 +97,13 @@ function solve1(data, rounds = 10)
       .filter((v, i, a) => a.filter(w => w[1] === v[1]).length === 1)
       .forEach(([ elf, npos ]) =>
       {
-        debug('move', elf, 'to new position', npos);
-        if (elves.has(npos)) { throw new Error(`${npos} occupied!`); }
         elves.delete(elf);
         elves.add(npos);
-        if (elves.has(elf)) { throw new Error(`${npos} still there!`); }
-        if (elves.size !== expectSize) { throw new Error('size mismatch!'); }
       });
 
     // Move first check to the end
     checks.push(checks.shift());
   }
-
-  debug('elves:', elves);
 
   const dim = {
     xmin: Number.MAX_SAFE_INTEGER,
@@ -134,7 +119,6 @@ function solve1(data, rounds = 10)
     if (y < dim.ymin) { dim.ymin = y; }
     if (y > dim.ymax) { dim.ymax = y; }
   });
-  debug('range is:', dim);
 
   return (1 + dim.xmax - dim.xmin) * (1 + dim.ymax - dim.ymin) - elves.size;
 }
@@ -159,8 +143,6 @@ export default async function day23(target)
     .filter(v => v)
     .map(v => v.split(''));
   /* eslint-enable no-shadow */
-
-  debug('data', data);
 
   const part1 = solve1(data);
   if (target.includes('example') && part1 !== 110)
