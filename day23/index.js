@@ -33,7 +33,6 @@ function solve1(data, rounds = 10)
   const key = (...args) => args[0] instanceof Array ?
     `${args[0][0]},${args[0][1]}` : `${args[0]},${args[1]}`;
   const unkey = k => k.split(',').map(v => parseInt(v, 10));
-  const summarize = s => JSON.stringify(Array.from(s));
 
   const elves = new Set();
   data.forEach((row, y) =>
@@ -64,7 +63,6 @@ function solve1(data, rounds = 10)
   const max = rounds < 0 ? 100000000 : 10;
   for (let i = 0; i < max; i++)
   {
-    const before = rounds < 0 ? summarize(elves) : 0;
     debug('round:', i + 1);
     const proposals = [];
     elves.forEach(elf =>
@@ -96,6 +94,13 @@ function solve1(data, rounds = 10)
       });
     });
 
+    // Exit for part2 if there are no more changes
+    if (rounds < 0 && proposals.length === 0)
+    {
+      console.log('no nore changes after round', i + 1);
+      return i + 1;
+    }
+
     proposals
       // Eliminate all proposals with duplicate position
       .filter((v, i, a) => a.filter(w => w[1] === v[1]).length === 1)
@@ -111,12 +116,6 @@ function solve1(data, rounds = 10)
 
     // Move first check to the end
     checks.push(checks.shift());
-
-    if (rounds < 0 && before === summarize(elves))
-    {
-      console.log('no nore changes after round', i + 1);
-      return i + 1;
-    }
   }
 
   debug('elves:', elves);
