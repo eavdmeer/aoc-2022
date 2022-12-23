@@ -10,6 +10,10 @@ here="${0%/*}"
 echo "Setting up for day $day..."
 target="day$day"
 
+[[ -d "target" ]] || {
+  echo "$target already exists!"
+  exit 1
+}
 mkdir -p "$target" || exit 1
 
 sarg="s/dayxx/day$day/; s/day: -1/day: $day/"
