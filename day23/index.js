@@ -30,12 +30,6 @@ function debug(...args)
 
 function solve1(data, rounds = 10)
 {
-  const timing = {
-    start: Date.now(),
-    part1: 0,
-    part2: 0
-  };
-
   const key = (...args) => args[0] instanceof Array ?
     `${args[0][0]},${args[0][1]}` : `${args[0]},${args[1]}`;
   const unkey = k => k.split(',').map(v => parseInt(v, 10));
@@ -65,7 +59,6 @@ function solve1(data, rounds = 10)
   const max = rounds < 0 ? 100000000 : 10;
   for (let i = 0; i < max; i++)
   {
-    const t1 = Date.now();
     const proposals = [];
     const once = new Set();
     const twice = new Set();
@@ -89,6 +82,7 @@ function solve1(data, rounds = 10)
         {
           return false;
         }
+
         const np = key(x + compass[step][X], y + compass[step][Y]);
         if (! twice.has(np))
         {
@@ -107,14 +101,9 @@ function solve1(data, rounds = 10)
       });
     });
 
-    const t2 = Date.now();
-    timing.part1 += t2 - t1;
-
     // Exit for part2 if there are no more changes
     if (rounds < 0 && proposals.length === 0)
     {
-      timing.total = Date.now() - timing.start;
-      console.log('timing:', timing);
       return i + 1;
     }
 
@@ -125,14 +114,10 @@ function solve1(data, rounds = 10)
         elves.delete(elf);
         elves.add(npos);
       });
-    const t3 = Date.now();
-    timing.part2 += t3 - t2;
 
     // Move first check to the end
     checks.push(checks.shift());
   }
-  timing.total = Date.now() - timing.start;
-  console.log('timing:', timing);
 
   const dim = {
     xmin: Number.MAX_SAFE_INTEGER,
