@@ -7,6 +7,7 @@ here="${0%/*}"
   echo >&2 "Usage: ${0##*/} day"
   exit 1
 }
+day=${day/day/}
 echo "Setting up for day $day..."
 target="day$day"
 

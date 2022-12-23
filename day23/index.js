@@ -4,7 +4,7 @@ let doDebug = false;
 if (process.argv[2])
 {
   doDebug = process.argv[2].includes('example');
-  day22(process.argv[2]).then(console.log);
+  day23(process.argv[2]).then(console.log);
 }
 
 function debug(...args)
@@ -23,7 +23,7 @@ function solve2()
   return 'todo';
 }
 
-export default async function day22(target)
+export default async function day23(target)
 {
   const start = Date.now();
   debug('starting');
@@ -52,5 +52,5 @@ export default async function day22(target)
     throw new Error(`Invalid solution: ${part1}. Expecting; 'todo'`);
   }
 
-  return { day: 22, part1, part2, duration: Date.now() - start };
+  return { day: 23, part1, part2, duration: Date.now() - start };
 }
