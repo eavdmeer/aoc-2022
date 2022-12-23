@@ -49,7 +49,7 @@ export default async function dayxx(target)
   const part2 = solve2(data);
   if (target.includes('example') && part2 !== 'todo')
   {
-    throw new Error(`Invalid solution: ${part1}. Expecting; 'todo'`);
+    throw new Error(`Invalid solution: ${part2}. Expecting; 'todo'`);
   }
 
   return { day: -1, part1, part2, duration: Date.now() - start };
