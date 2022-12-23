@@ -28,11 +28,12 @@ function debug(...args)
   console.log(...args);
 }
 
-function solve1(data)
+function solve1(data, rounds = 10)
 {
   const key = (...args) => args[0] instanceof Array ?
     `${args[0][0]},${args[0][1]}` : `${args[0]},${args[1]}`;
   const unkey = k => k.split(',').map(v => parseInt(v, 10));
+  const summarize = s => JSON.stringify(Array.from(s));
 
   const elves = new Set();
   data.forEach((row, y) =>
@@ -60,8 +61,10 @@ function solve1(data)
 
   const expectSize = elves.size;
 
-  for (let i = 0; i < 10; i++)
+  const max = rounds < 0 ? 100000000 : 10;
+  for (let i = 0; i < max; i++)
   {
+    const before = rounds < 0 ? summarize(elves) : 0;
     debug('round:', i + 1);
     const proposals = [];
     elves.forEach(elf =>
@@ -108,6 +111,12 @@ function solve1(data)
 
     // Move first check to the end
     checks.push(checks.shift());
+
+    if (rounds < 0 && before === summarize(elves))
+    {
+      console.log('no nore changes after round', i + 1);
+      return i + 1;
+    }
   }
 
   debug('elves:', elves);
@@ -131,9 +140,9 @@ function solve1(data)
   return (1 + dim.xmax - dim.xmin) * (1 + dim.ymax - dim.ymin) - elves.size;
 }
 
-function solve2()
+function solve2(data)
 {
-  return 'todo';
+  return solve1(data, -1);
 }
 
 export default async function day23(target)
@@ -161,9 +170,9 @@ export default async function day23(target)
   }
 
   const part2 = solve2(data);
-  if (target.includes('example') && part2 !== 'todo')
+  if (target.includes('example') && part2 !== 20)
   {
-    throw new Error(`Invalid solution: ${part1}. Expecting; 'todo'`);
+    throw new Error(`Invalid solution: ${part1}. Expecting; 20`);
   }
 
   return { day: 23, part1, part2, duration: Date.now() - start };
