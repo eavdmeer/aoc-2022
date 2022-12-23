@@ -171,7 +171,7 @@ export default async function day23(target)
   const part2 = solve2(data);
   if (target.includes('example') && part2 !== 20)
   {
-    throw new Error(`Invalid solution: ${part1}. Expecting; 20`);
+    throw new Error(`Invalid solution: ${part2}. Expecting; 20`);
   }
 
   return { day: 23, part1, part2, duration: Date.now() - start };
