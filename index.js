@@ -18,30 +18,41 @@ import day17 from './day17/index.js';
 import day18 from './day18/index.js';
 import day19 from './day19/index.js';
 import day20 from './day20/index.js';
+import day21 from './day21/index.js';
+import day22 from './day22/index.js';
+import day23 from './day23/index.js';
 
 async function getResults()
 {
+  const report = v =>
+  {
+    console.log(`day ${v.day} solved in ${v.duration} ms`);
+    return v;
+  };
   const result = [
-    await day1('day1/data.txt'),
-    await day2('day2/data.txt'),
-    await day3('day3/data.txt'),
-    await day4('day4/data.txt'),
-    await day5('day5/data.txt'),
-    await day6('day6/data.txt'),
-    await day7('day7/data.txt'),
-    await day8('day8/data.txt'),
-    await day9('day9/data.txt'),
-    await day10('day10/data.txt'),
-    await day11('day11/data.txt'),
-    await day12('day12/data.txt'),
-    await day13('day13/data.txt'),
-    await day14('day14/data.txt'),
-    await day15('day15/data.txt'),
-    await day16('day16/data.txt'),
-    await day17('day17/data.txt'),
-    await day18('day18/data.txt'),
-    await day19('day19/data.txt'),
-    await day20('day20/data.txt')
+    await day1('day1/data.txt').then(report),
+    await day2('day2/data.txt').then(report),
+    await day3('day3/data.txt').then(report),
+    await day4('day4/data.txt').then(report),
+    await day5('day5/data.txt').then(report),
+    await day6('day6/data.txt').then(report),
+    await day7('day7/data.txt').then(report),
+    await day8('day8/data.txt').then(report),
+    await day9('day9/data.txt').then(report),
+    await day10('day10/data.txt').then(report),
+    await day11('day11/data.txt').then(report),
+    await day12('day12/data.txt').then(report),
+    await day13('day13/data.txt').then(report),
+    await day14('day14/data.txt').then(report),
+    await day15('day15/data.txt').then(report),
+    await day16('day16/data.txt').then(report),
+    await day17('day17/data.txt').then(report),
+    await day18('day18/data.txt').then(report),
+    await day19('day19/data.txt').then(report),
+    await day20('day20/data.txt').then(report),
+    await day21('day21/data.txt').then(report),
+    await day22('day22/data.txt').then(report),
+    await day23('day23/data.txt').then(report)
   ];
   return result.sort((a, b) => a.day - b.day);
 }
