@@ -6,13 +6,15 @@ const X = 0;
 const Y = 1;
 const TYPE = 2;
 
+/* eslint-disable quote-props */
 const dirs = {
   '>': [ 1, 0 ],
-  /* eslint-disable-next-line quote-props */
   'v': [ 0, 1 ],
   '<': [ -1, 0 ],
-  '^': [ 0, -1 ]
+  '^': [ 0, -1 ],
+  'x': [ 0, 0 ]
 };
+/* eslint-enable quote-props */
 
 const posmod = (v, n) => (v % n + n) % n;
 
@@ -43,19 +45,31 @@ function findPath(data, width, height, entry, dest, timeStep)
   heap.push({ cost: 0, pos: entry, path: [] });
   blizzCache[0] = data;
 
-  const cycle = lcm(width, height);
+  const cycle = lcm(width - 2, height - 2);
+
+  const seen = new Set();
 
   while (heap.length > 0 && heap.length < 200000)
   {
     const { cost, pos, path } = heap.shift();
     debug('try(', heap.length, '): cost:', cost, 'pos:',
       pos, 'path:', path);
+
     path.push(pos);
+
     if (same(pos, dest))
     {
       debug('destination', dest, 'reached');
       return { cost, path };
     }
+
+    const seenKey = `${pos[X]}${pos[Y]}${cost % cycle}`;
+    if (seen.has(seenKey))
+    {
+      debug('cyclic state detected, giving up on this path');
+      continue;
+    }
+    seen.add(seenKey);
 
     const idx = (cost + 1) % cycle;
     if (!(idx in blizzCache))
@@ -92,20 +106,9 @@ function findPath(data, width, height, entry, dest, timeStep)
     });
 
     debug('canMove:', canMove);
-
-    // If we can't move, we can wait in place, but only if no blizzard has
-    // hit our current position
     if (canMove.length === 0)
     {
-      if (taken.has(key(pos)))
-      {
-        debug('got hit by a blizzard, invalid path at', pos);
-      }
-      else
-      {
-        debug('waiting in place:', pos);
-        heap.push({ cost: cost + 1, pos, path: path.slice() });
-      }
+      debug('got hit by a blizzard, giving up on path');
     }
   }
   throw new Error(`Unable to find a valid path to (${dest[X]}, ${dest[Y]})`);
@@ -144,6 +147,7 @@ function solve1(data)
 
   const path = findPath(blizzards, width, height, entry, exit, timeStep);
 
+  doDebug = true;
   debug('best path:', path);
 
   return path.cost;
@@ -172,7 +176,6 @@ export default async function day24(target)
 
   debug('data', data);
 
-  doDebug = true;
   const part1 = solve1(data);
   if (target.includes('example') && part1 !== 18)
   {
