@@ -30,7 +30,7 @@ function debug(...args)
 
 const blizzCache = {};
 
-function findPath(entry, data, dest, timeStep)
+function findPath(data, width, height, entry, dest, timeStep)
 {
   // Utility functions
   const key = (...args) => args[0] instanceof Array ?
@@ -68,9 +68,9 @@ function findPath(entry, data, dest, timeStep)
     Object.entries(dirs).forEach(([ k, d ]) =>
     {
       const p = [ pos[X] + d[X], pos[Y] + d[Y] ];
-      if (
-        p[X] <= 0 || p[X] >= bliz.width - 1 ||
-        p[Y] <= 0 || p[Y] >= bliz.height - 1)
+      if (! same(p, dest) && (
+        p[X] <= 0 || p[X] >= width - 1 ||
+        p[Y] <= 0 || p[Y] >= height - 1))
       {
         debug('wall', k, 'at', p);
         return;
@@ -138,9 +138,7 @@ function solve1(data)
       v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
     });
 
-  blizzards.width = width;
-  blizzards.height = height;
-  const path = findPath(entry, blizzards, exit, timeStep);
+  const path = findPath(blizzards, width, height, entry, exit, timeStep);
 
   debug('best path:', path);
 
