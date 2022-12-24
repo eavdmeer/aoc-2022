@@ -42,10 +42,10 @@ function findPath(entry, data, dest, timeStep)
   heap.push({ cost: 0, pos: entry, path: [] });
   blizzCache[0] = data;
 
-  while (heap.length() > 0 && heap.length() < 200000)
+  while (heap.length > 0 && heap.length < 200000)
   {
     const { cost, pos, path } = heap.shift();
-    debug('try(', heap.length(), '): cost:', cost, 'pos:',
+    debug('try(', heap.length, '): cost:', cost, 'pos:',
       pos, 'path:', path);
     path.push(pos);
     if (same(pos, dest))
