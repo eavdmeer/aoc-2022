@@ -147,7 +147,6 @@ function solve1(data)
 
   const path = findPath(blizzards, width, height, entry, exit, 0, timeStep);
 
-  doDebug = true;
   debug('best path:', path);
 
   return path.cost;
