@@ -52,11 +52,14 @@ function findPath(data, width, height, entry, dest, time = 0)
   // Prepare the cache with all steps in the cycle
   const cycle = lcm(width - 2, height - 2);
   debug('cycle is:', cycle);
-  blizzCache[0] = data;
-  for (let i = 1; i < cycle; i++)
+  const work = dc(data);
+  for (let i = 0; i < cycle; i++)
   {
-    blizzCache[i] = dc(blizzCache[i - 1]);
-    timeStep(blizzCache[i]);
+    if (! (i in blizzCache))
+    {
+      blizzCache[i] = new Set(work.map(v => key(v[X], v[Y])));
+      timeStep(work);
+    }
   }
 
   const seen = new Set();
@@ -67,28 +70,19 @@ function findPath(data, width, height, entry, dest, time = 0)
   while (heap.length > 0 && heap.length < 200000)
   {
     const { cost, pos, path } = heap.shift();
-    debug('try(', heap.length, '): cost:', cost, 'pos:',
-      pos, 'path:', path);
 
     path.push(pos);
 
     if (same(pos, dest))
     {
-      debug('destination', dest, 'reached');
       return { cost, path };
     }
 
     const seenKey = `${pos[X]}${pos[Y]}${cost % cycle}`;
-    if (seen.has(seenKey))
-    {
-      debug('cyclic state detected, giving up on this path');
-      continue;
-    }
+    if (seen.has(seenKey)) { continue; }
     seen.add(seenKey);
 
-    const bliz = blizzCache[(cost + 1) % cycle];
-
-    const taken = new Set(bliz.map(v => key(v[X], v[Y])));
+    const taken = blizzCache[(cost + 1) % cycle];
 
     const canMove = [];
     Object.entries(dirs).forEach(([ k, d ]) =>
@@ -98,26 +92,14 @@ function findPath(data, width, height, entry, dest, time = 0)
         p[X] <= 0 || p[X] >= width - 1 ||
         p[Y] <= 0 || p[Y] >= height - 1))
       {
-        debug('wall', k, 'at', p);
         return;
       }
       if (! taken.has(key(p[X], p[Y])))
       {
-        debug('can move', k, 'to:', p);
         heap.push({ cost: cost + 1, pos: p, path: path.slice() });
         canMove.push(k);
       }
-      else
-      {
-        debug('unable to move', k, 'to:', p);
-      }
     });
-
-    debug('canMove:', canMove);
-    if (canMove.length === 0)
-    {
-      debug('got hit by a blizzard, giving up on path');
-    }
   }
   throw new Error(`Unable to find a valid path to (${dest[X]}, ${dest[Y]})`);
 }
