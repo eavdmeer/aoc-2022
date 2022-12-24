@@ -1,14 +1,18 @@
 {
   "root": true,
   "plugins": [
+    "jest"
   ],
   "env": {
     "browser": true,
     "commonjs": true,
     "es6": true,
-    "node": true
+    "node": true,
+    "jest/globals": true
   },
   "extends": [
+    "plugin:jest/recommended",
+    "plugin:jest/style",
     "eslint:recommended"
   ],
   "globals": {
@@ -65,6 +69,11 @@
     "indent": [ "error", 2, { "SwitchCase": 1 } ],
     "indent-legacy": "off",
     "init-declarations": "off",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error",
     "jsx-quotes": "error",
     "key-spacing": "error",
     "keyword-spacing": "off",
