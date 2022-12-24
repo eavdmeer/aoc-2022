@@ -37,17 +37,6 @@ const blizzCache = {};
 
 function findPath(data, width, height, entry, dest, time = 0)
 {
-  const times = {
-    part1: 0,
-    part2: 0,
-    part2a: 0,
-    part2b: 0,
-    part2c: 0,
-    part2d: 0,
-    part2e: 0
-  };
-  const start = Date.now();
-
   // Utility functions
   const key = (...args) => args[0] instanceof Array ?
     `${args[0][0]},${args[0][1]}` : `${args[0]},${args[1]}`;
@@ -75,9 +64,6 @@ function findPath(data, width, height, entry, dest, time = 0)
     }
   }
 
-  const t1 = Date.now();
-  times.part1 = t1 - start;
-
   const seen = new Set();
 
   const heap = new MinPriorityQueue(v => v.cost);
@@ -85,31 +71,17 @@ function findPath(data, width, height, entry, dest, time = 0)
 
   while (heap.size() > 0 && heap.size() < 200000)
   {
-    const t2a = Date.now();
     const { cost, pos, path } = heap.dequeue();
 
     path.push(pos);
 
-    const t2b = Date.now();
-
-    if (same(pos, dest))
-    {
-      times.part2 = Date.now() - t1;
-      console.log('Times:', times);
-      return { cost, path };
-    }
-
-    const t2c = Date.now();
+    if (same(pos, dest)) { return { cost, path }; }
 
     const seenKey = `${pos[X]}${pos[Y]}${cost % cycle}`;
     if (seen.has(seenKey)) { continue; }
     seen.add(seenKey);
 
-    const t2d = Date.now();
-
     const taken = blizzCache[(cost + 1) % cycle];
-
-    const t2e = Date.now();
 
     const canMove = [];
     Object.entries(dirs).forEach(([ k, d ]) =>
@@ -127,13 +99,6 @@ function findPath(data, width, height, entry, dest, time = 0)
         canMove.push(k);
       }
     });
-    const t2f = Date.now();
-
-    times.part2a += t2b - t2a;
-    times.part2b += t2c - t2b;
-    times.part2c += t2d - t2c;
-    times.part2d += t2e - t2d;
-    times.part2e += t2f - t2e;
   }
   throw new Error(`Unable to find a valid path to (${dest[X]}, ${dest[Y]})`);
 }
@@ -219,14 +184,11 @@ export default async function day24(target)
     throw new Error(`Invalid solution: ${part1}. Expecting; 18`);
   }
 
-  /*
   const part2 = solve2(data, part1);
   if (target.includes('example') && part2 !== 54)
   {
     throw new Error(`Invalid solution: ${part2}. Expecting; 54`);
   }
-  */
-  const part2 = 'disabled';
 
   return { day: 24, part1, part2, duration: Date.now() - start };
 }
