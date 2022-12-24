@@ -33,7 +33,7 @@ function debug(...args)
 
 const blizzCache = {};
 
-function findPath(data, width, height, entry, dest, timeStep)
+function findPath(data, width, height, entry, dest, time = 0, timeStep)
 {
   // Utility functions
   const key = (...args) => args[0] instanceof Array ?
@@ -42,7 +42,7 @@ function findPath(data, width, height, entry, dest, timeStep)
   const dc = obj => JSON.parse(JSON.stringify(obj));
 
   const heap = new PriorityQueue(v => v.cost);
-  heap.push({ cost: 0, pos: entry, path: [] });
+  heap.push({ cost: time, pos: entry, path: [] });
   blizzCache[0] = data;
 
   const cycle = lcm(width - 2, height - 2);
@@ -86,7 +86,7 @@ function findPath(data, width, height, entry, dest, timeStep)
     Object.entries(dirs).forEach(([ k, d ]) =>
     {
       const p = [ pos[X] + d[X], pos[Y] + d[Y] ];
-      if (! same(p, dest) && (
+      if (! same(p, entry) && ! same(p, dest) && (
         p[X] <= 0 || p[X] >= width - 1 ||
         p[Y] <= 0 || p[Y] >= height - 1))
       {
@@ -145,7 +145,7 @@ function solve1(data)
       v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
     });
 
-  const path = findPath(blizzards, width, height, entry, exit, timeStep);
+  const path = findPath(blizzards, width, height, entry, exit, 0, timeStep);
 
   doDebug = true;
   debug('best path:', path);
@@ -153,9 +153,40 @@ function solve1(data)
   return path.cost;
 }
 
-function solve2()
+function solve2(data, startTime)
 {
-  return 'todo';
+  const width = data[0].length;
+  const height = data.length;
+
+  const entry = [];
+  const exit = [];
+  const blizzards = [];
+  data.forEach((row, y) =>
+  {
+    row.forEach((col, x) =>
+    {
+      if (/[><^v]/.test(col)) { blizzards.push([ x, y, col ]); }
+      if (y === 0 && col === '.') { entry.push(x, y); }
+      if (y === height - 1 && col === '.') { exit.push(x, y); }
+    });
+  });
+
+  // function to move all blizzards one time step
+  const timeStep = input =>
+    input.forEach(v =>
+    {
+      v[X] = 1 + posmod(v[X] - 1 + dirs[v[TYPE]][X], width - 2);
+      v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
+    });
+
+  const path1 = findPath(blizzards, width, height, exit, entry,
+    startTime, timeStep);
+  debug('path 1 cost:', path1.cost);
+  const path2 = findPath(blizzards, width, height, entry, exit,
+    path1.cost, timeStep);
+  debug('path 2 cost:', path2.cost);
+
+  return path2.cost;
 }
 
 export default async function day24(target)
@@ -182,10 +213,10 @@ export default async function day24(target)
     throw new Error(`Invalid solution: ${part1}. Expecting; 18`);
   }
 
-  const part2 = solve2(data);
-  if (target.includes('example') && part2 !== 'todo')
+  const part2 = solve2(data, part1);
+  if (target.includes('example') && part2 !== 54)
   {
-    throw new Error(`Invalid solution: ${part2}. Expecting; 'todo'`);
+    throw new Error(`Invalid solution: ${part2}. Expecting; 54`);
   }
 
   return { day: 24, part1, part2, duration: Date.now() - start };
