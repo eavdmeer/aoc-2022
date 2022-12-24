@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import PriorityQueue from '../lib/priorityqueue.js';
+import { lcm } from '../lib/lcm.js';
 
 const X = 0;
 const Y = 1;
@@ -42,6 +43,8 @@ function findPath(data, width, height, entry, dest, timeStep)
   heap.push({ cost: 0, pos: entry, path: [] });
   blizzCache[0] = data;
 
+  const cycle = lcm(width, height);
+
   while (heap.length > 0 && heap.length < 200000)
   {
     const { cost, pos, path } = heap.shift();
@@ -54,13 +57,14 @@ function findPath(data, width, height, entry, dest, timeStep)
       return { cost, path };
     }
 
-    if (!(cost + 1 in blizzCache))
+    const idx = (cost + 1) % cycle;
+    if (!(idx in blizzCache))
     {
-      const n = dc(blizzCache[cost]);
+      const n = dc(blizzCache[cost % cycle]);
       timeStep(n);
-      blizzCache[cost + 1] = n;
+      blizzCache[idx] = n;
     }
-    const bliz = blizzCache[cost + 1];
+    const bliz = blizzCache[idx];
 
     const taken = new Set(bliz.map(v => key(v[X], v[Y])));
 
