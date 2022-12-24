@@ -37,7 +37,7 @@ export default {
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: 'v8'
+  coverageProvider: 'v8',
 
   // A list of reporter names that Jest uses when writing coverage reports
 
@@ -186,7 +186,7 @@ export default {
 
   // The test environment that will be used for testing
 
-  // testEnvironment: "jest-environment-node",
+  testEnvironment: 'jest-environment-node',
 
   // Options that will be passed to the testEnvironment
 
@@ -225,7 +225,7 @@ export default {
 
   // A map from regular expressions to paths to transformers
 
-  // transform: undefined,
+  transform: {}
 
   // An array of regexp pattern strings that are matched against all source
   // file paths, matched files will skip transformation
