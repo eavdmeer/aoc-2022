@@ -33,7 +33,7 @@ function debug(...args)
 
 const blizzCache = {};
 
-function findPath(data, width, height, entry, dest, time = 0, timeStep)
+function findPath(data, width, height, entry, dest, time = 0)
 {
   // Utility functions
   const key = (...args) => args[0] instanceof Array ?
@@ -41,13 +41,28 @@ function findPath(data, width, height, entry, dest, time = 0, timeStep)
   const same = (a, b) => a[X] === b[X] && a[Y] === b[Y];
   const dc = obj => JSON.parse(JSON.stringify(obj));
 
-  const heap = new PriorityQueue(v => v.cost);
-  heap.push({ cost: time, pos: entry, path: [] });
-  blizzCache[0] = data;
+  // function to move all blizzards one time step
+  const timeStep = input =>
+    input.forEach(v =>
+    {
+      v[X] = 1 + posmod(v[X] - 1 + dirs[v[TYPE]][X], width - 2);
+      v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
+    });
 
+  // Prepare the cache with all steps in the cycle
   const cycle = lcm(width - 2, height - 2);
+  debug('cycle is:', cycle);
+  blizzCache[0] = data;
+  for (let i = 1; i < cycle; i++)
+  {
+    blizzCache[i] = dc(blizzCache[i - 1]);
+    timeStep(blizzCache[i]);
+  }
 
   const seen = new Set();
+
+  const heap = new PriorityQueue(v => v.cost);
+  heap.push({ cost: time, pos: entry, path: [] });
 
   while (heap.length > 0 && heap.length < 200000)
   {
@@ -71,14 +86,7 @@ function findPath(data, width, height, entry, dest, time = 0, timeStep)
     }
     seen.add(seenKey);
 
-    const idx = (cost + 1) % cycle;
-    if (!(idx in blizzCache))
-    {
-      const n = dc(blizzCache[cost % cycle]);
-      timeStep(n);
-      blizzCache[idx] = n;
-    }
-    const bliz = blizzCache[idx];
+    const bliz = blizzCache[(cost + 1) % cycle];
 
     const taken = new Set(bliz.map(v => key(v[X], v[Y])));
 
@@ -137,15 +145,8 @@ function solve1(data)
   debug('width:', width);
   debug('height:', height);
 
-  // function to move all blizzards one time step
-  const timeStep = input =>
-    input.forEach(v =>
-    {
-      v[X] = 1 + posmod(v[X] - 1 + dirs[v[TYPE]][X], width - 2);
-      v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
-    });
 
-  const path = findPath(blizzards, width, height, entry, exit, 0, timeStep);
+  const path = findPath(blizzards, width, height, entry, exit, 0);
 
   debug('best path:', path);
 
@@ -170,19 +171,9 @@ function solve2(data, startTime)
     });
   });
 
-  // function to move all blizzards one time step
-  const timeStep = input =>
-    input.forEach(v =>
-    {
-      v[X] = 1 + posmod(v[X] - 1 + dirs[v[TYPE]][X], width - 2);
-      v[Y] = 1 + posmod(v[Y] - 1 + dirs[v[TYPE]][Y], height - 2);
-    });
-
-  const path1 = findPath(blizzards, width, height, exit, entry,
-    startTime, timeStep);
+  const path1 = findPath(blizzards, width, height, exit, entry, startTime);
   debug('path 1 cost:', path1.cost);
-  const path2 = findPath(blizzards, width, height, entry, exit,
-    path1.cost, timeStep);
+  const path2 = findPath(blizzards, width, height, entry, exit, path1.cost);
   debug('path 2 cost:', path2.cost);
 
   return path2.cost;
