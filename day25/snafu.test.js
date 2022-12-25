@@ -29,7 +29,7 @@ describe('fromSnafu()', () =>
 
 describe('toSnafu()', () =>
 {
-  it('properly converts from SNAFU to decimal', () =>
+  it('properly converts from decimal to SNAFU', () =>
   {
     const tests = [
       [ 1, '1' ],
