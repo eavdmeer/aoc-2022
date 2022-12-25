@@ -21,26 +21,22 @@ const cachePut = (k, v) => cache[k] = v;
 const cacheHas = k => k in cache;
 const cacheGet = k => cache[k];
 
-const findValve = (valves, id) => valves.find(v => v.id === id);
-
 function dfs(valves, valveId, time, opened)
 {
-  // Utility functions
   const db = (...args) => debug(time, '-', ...args);
+  const findValve = id => valves.find(v => v.id === id);
+
+  db('-----', 'min', time, '----');
+  db('valve :', valveId);
+  db('opened:', opened);
 
   const key = cacheKey(valveId, time, opened);
+  if (cacheHas(key)) { cacheGet(key); }
 
-  if (cacheHas(key)) { return cacheGet(key); }
-
-  const valve = findValve(valves, valveId);
-  if (valve === undefined)
-  {
-    throw new Error(`unable to find valve ${valveId}`);
-  }
+  const valve = findValve(valveId);
 
   // Open the current valve and add all the volume it can produce
   const volume = (time - 1) * valve.flow;
-
   opened[valveId] = true;
 
   db('checking connected valves');
@@ -66,12 +62,10 @@ function dfs(valves, valveId, time, opened)
 
   db('Best value for', valveId, 'is', volume + best);
 
-  cachePut(key, volume + best);
-
   return volume + best;
 }
 
-function findOpenDistance(valves)
+function solve(valves, start, duration = 30)
 {
   const graph = new Graph(v => v.id);
 
@@ -98,17 +92,9 @@ function findOpenDistance(valves)
   });
   debug('valves with distances', withFlow);
 
-  return withFlow;
-}
+  const val = dfs(withFlow, start, duration, {});
 
-function solve1(data)
-{
-  return dfs(findOpenDistance(data), 'AA', 30, {});
-}
-
-function solve2()
-{
-  return 'todo';
+  return val;
 }
 
 export default async function day16(target)
@@ -132,17 +118,8 @@ export default async function day16(target)
 
   // const part1 = maxflow(valves, valves.find(v => v.id === 'AA'), {}, 30);
 
-  const part1 = solve1(valves);
-  if (target.includes('example') && part1 !== 1651)
-  {
-    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
-  }
-
-  const part2 = solve2(valves);
-  if (target.includes('example') && part2 !== 1707)
-  {
-    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 1707`);
-  }
+  const part1 = solve(valves, 'AA');
+  const part2 = 'todo';
 
   return { day: 16, part1, part2, duration: Date.now() - start };
 }
