@@ -22,6 +22,7 @@ import day21 from './day21/index.js';
 import day22 from './day22/index.js';
 import day23 from './day23/index.js';
 import day24 from './day24/index.js';
+import day25 from './day25/index.js';
 
 async function getResults()
 {
@@ -54,7 +55,8 @@ async function getResults()
     await day21('day21/data.txt').then(report),
     await day22('day22/data.txt').then(report),
     await day23('day23/data.txt').then(report),
-    await day24('day24/data.txt').then(report)
+    await day24('day24/data.txt').then(report),
+    await day25('day25/data.txt').then(report)
   ];
   return result.sort((a, b) => a.day - b.day);
 }
