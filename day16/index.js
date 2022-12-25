@@ -15,7 +15,6 @@ function debug(...args)
 }
 
 const cache = {};
-let fromCache = 0;
 
 function dfs(valves, valveId, time, opened)
 {
@@ -27,19 +26,11 @@ function dfs(valves, valveId, time, opened)
   const cacheHas = () => key(valveId, time, opened) in cache;
   const cacheGet = () => cache[key(valveId, time, opened)];
 
-  // Required for the cache
+  // Old valuve state is required for the cache
   const oldOpened = { ...opened };
   const cachePut = val => cache[key(valveId, time, oldOpened)] = val;
 
-  db('-----', 'min', time, '----');
-  db('valve :', valveId);
-  db('opened:', opened);
-
-  if (cacheHas())
-  {
-    fromCache++;
-    return cacheGet();
-  }
+  if (cacheHas()) { return cacheGet(); }
 
   const valve = findValve(valveId);
   if (valve === undefined)
@@ -49,9 +40,6 @@ function dfs(valves, valveId, time, opened)
 
   // Open the current valve and add all the volume it can produce
   const volume = (time - 1) * valve.flow;
-
-  db('valve', valveId, 'with flow', valve.flow, 'opened for',
-    time - 1, 'remaining minutes for', volume, 'volume');
 
   opened[valveId] = true;
 
