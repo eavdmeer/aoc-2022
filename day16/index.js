@@ -15,24 +15,24 @@ function debug(...args)
 }
 
 const cache = {};
+const cacheKey = (i, t, s) =>
+  `${i}-${t}-${Object.values(s).map(v => v ? 1 : 0).join('')}`;
+const cachePut = (k, v) => cache[k] = v;
+const cacheHas = k => k in cache;
+const cacheGet = k => cache[k];
+
+const findValve = (valves, id) => valves.find(v => v.id === id);
 
 function dfs(valves, valveId, time, opened)
 {
   // Utility functions
   const db = (...args) => debug(time, '-', ...args);
-  const findValve = id => valves.find(v => v.id === id);
-  const key = (id, t, state) =>
-    `${id}-${t}-${Object.values(state).map(v => v ? 1 : 0).join('')}`;
-  const cacheHas = () => key(valveId, time, opened) in cache;
-  const cacheGet = () => cache[key(valveId, time, opened)];
 
-  // Old valuve state is required for the cache
-  const oldOpened = { ...opened };
-  const cachePut = val => cache[key(valveId, time, oldOpened)] = val;
+  const key = cacheKey(valveId, time, opened);
 
-  if (cacheHas()) { return cacheGet(); }
+  if (cacheHas(key)) { return cacheGet(key); }
 
-  const valve = findValve(valveId);
+  const valve = findValve(valves, valveId);
   if (valve === undefined)
   {
     throw new Error(`unable to find valve ${valveId}`);
@@ -66,7 +66,7 @@ function dfs(valves, valveId, time, opened)
 
   db('Best value for', valveId, 'is', volume + best);
 
-  cachePut(volume + best);
+  cachePut(key, volume + best);
 
   return volume + best;
 }
