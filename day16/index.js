@@ -62,6 +62,8 @@ function dfs(valves, valveId, time, opened)
 
   db('Best value for', valveId, 'is', volume + best);
 
+  cachePut(key, volume + best);
+
   return volume + best;
 }
 
