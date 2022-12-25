@@ -2,6 +2,8 @@ import * as fs from 'fs/promises';
 import Graph from '../lib/graph.js';
 
 let doDebug = false;
+const enabled = { 1: true, 2: false };
+
 if (process.argv[2])
 {
   doDebug = process.argv[2].includes('example');
@@ -28,11 +30,7 @@ const findValve = (valves, id) => valves.find(v => v.id === id);
 
 function dfs(valves, valveId, time, opened)
 {
-  // Utility functions
-  const db = (...args) => debug(time, '-', ...args);
-
   const key = cacheKey(valveId, time, opened);
-  debug('cache key is', key);
   if (cacheHas(key)) { return cacheGet(key); }
 
   const valve = findValve(valves, valveId);
@@ -41,28 +39,19 @@ function dfs(valves, valveId, time, opened)
   const volume = valve ? (time - 1) * valve.flow : 0;
   opened[valveId] = true;
 
-  db('checking connected valves');
   const results = Object
     .entries(valve.dist)
     .filter(([ k ]) => ! (k in opened))
     .map(([ vid, dist ]) =>
     {
       const ntime = time - dist - (valveId === 'AA' ? 0 : 1);
-      if (ntime < 1)
-      {
-        db('skipping node', vid, 'as there is no time to open it');
-        return 0;
-      }
+      if (ntime < 1) { return 0; }
       const nopened = { ...opened };
-      db('jumping to node', vid, 'from', valveId, 'at time', ntime,
-        'to open valve at dist', dist);
 
       return dfs(valves, vid, ntime, nopened);
     });
 
   const best = Math.max(0, ...results);
-
-  db('Best value for', valveId, 'is', volume + best);
 
   cachePut(key, volume + best);
 
@@ -112,7 +101,7 @@ function solve2(data)
   debug('all valves with flow:', list);
 
   const b = (1 << list.length) - 1;
-  console.log('checking', Math.floor((b + 1) / 2), 'combinations');
+  debug('checking', Math.floor((b + 1) / 2), 'combinations');
 
   let max = 0;
 
@@ -163,13 +152,13 @@ export default async function day16(target)
 
   // const part1 = maxflow(valves, valves.find(v => v.id === 'AA'), {}, 30);
 
-  const part1 = solve1(valves);
+  const part1 = enabled[1] ? solve1(valves) : 'todo';
   if (target.includes('example') && part1 !== 1651)
   {
     throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
   }
 
-  const part2 = solve2(valves);
+  const part2 = enabled[2] ? solve2(valves) : 'todo';
   if (target.includes('example') && (part2 !== 'todo' && part2 !== 1707))
   {
     throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 1707`);
