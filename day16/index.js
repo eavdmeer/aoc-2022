@@ -14,23 +14,31 @@ function debug(...args)
   console.log(...args);
 }
 
-function dfs(valves, valveId, time, volume, opened)
+const cache = {};
+let fromCache = 0;
+
+function dfs(valves, valveId, time, opened)
 {
+  // Utility functions
   const db = (...args) => debug(time, '-', ...args);
   const findValve = id => valves.find(v => v.id === id);
+  const key = (id, t, state) =>
+    `${id}-${t}-${Object.values(state).map(v => v ? 1 : 0).join('')}`;
+  const cacheHas = () => key(valveId, time, opened) in cache;
+  const cacheGet = () => cache[key(valveId, time, opened)];
+
+  // Required for the cache
+  const oldOpened = { ...opened };
+  const cachePut = val => cache[key(valveId, time, oldOpened)] = val;
 
   db('-----', 'min', time, '----');
   db('valve :', valveId);
-  db('volume:', volume);
   db('opened:', opened);
 
-  if (time === 0) { return volume; }
-
-  // All valves are open
-  if (valves.filter(v => !(v.id in opened)).length === 0)
+  if (cacheHas())
   {
-    db('all valves are already open');
-    return volume;
+    fromCache++;
+    return cacheGet();
   }
 
   const valve = findValve(valveId);
@@ -40,10 +48,11 @@ function dfs(valves, valveId, time, volume, opened)
   }
 
   // Open the current valve and add all the volume it can produce
-  let nvolume = volume + (time - 1) * valve.flow;
+  const volume = (time - 1) * valve.flow;
+
   db('valve', valveId, 'with flow', valve.flow, 'opened for',
-    time - 1, 'remaining minutes');
-  db('new maximum volume is', nvolume);
+    time - 1, 'remaining minutes for', volume, 'volume');
+
   opened[valveId] = true;
 
   db('checking connected valves');
@@ -62,17 +71,19 @@ function dfs(valves, valveId, time, volume, opened)
       db('jumping to node', vid, 'from', valveId, 'at time', ntime,
         'to open valve at dist', dist);
 
-      return dfs(valves, vid, ntime, nvolume, nopened);
+      return dfs(valves, vid, ntime, nopened);
     });
 
-  nvolume = Math.max(nvolume, ...results);
+  const best = Math.max(0, ...results);
 
-  db('Best value for', valveId, 'is', nvolume);
+  db('Best value for', valveId, 'is', volume + best);
 
-  return nvolume;
+  cachePut(volume + best);
+
+  return volume + best;
 }
 
-function solve(valves, start, duration = 30)
+function findOpenDistance(valves)
 {
   const graph = new Graph(v => v.id);
 
@@ -99,9 +110,17 @@ function solve(valves, start, duration = 30)
   });
   debug('valves with distances', withFlow);
 
-  const val = dfs(withFlow, start, duration, 0, {});
+  return withFlow;
+}
 
-  return val;
+function solve1(data)
+{
+  return dfs(findOpenDistance(data), 'AA', 30, {});
+}
+
+function solve2()
+{
+  return 'todo';
 }
 
 export default async function day16(target)
@@ -125,8 +144,17 @@ export default async function day16(target)
 
   // const part1 = maxflow(valves, valves.find(v => v.id === 'AA'), {}, 30);
 
-  const part1 = solve(valves, 'AA');
-  const part2 = 'todo';
+  const part1 = solve1(valves);
+  if (target.includes('example') && part1 !== 1651)
+  {
+    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
+  }
+
+  const part2 = solve2(valves);
+  if (target.includes('example') && part2 !== 1707)
+  {
+    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 1707`);
+  }
 
   return { day: 16, part1, part2, duration: Date.now() - start };
 }
