@@ -1,7 +1,10 @@
 import * as fs from 'fs/promises';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 
+let mapped = false;
 let doDebug = false;
+const enabled = { 1: true, 2: false };
+
 if (process.argv[2])
 {
   doDebug = process.argv[2].includes('example');
@@ -17,11 +20,39 @@ function debug(...args)
 const valves = {};
 const tunnels = {};
 
-export default async function day16(target)
-{
-  const start = Date.now();
+const dists = {};
+const nonempty = [];
 
-  const buffer = await fs.readFile(target);
+const indices = {};
+
+const cache = {};
+
+function dfs(time, valve, bitmask)
+{
+  const key = `${time}-${valve}-${bitmask}`;
+  if (key in cache) { return cache[key]; }
+
+  let maxval = 0;
+
+  Object.keys(dists[valve]).forEach(neighbor =>
+  {
+    const bit = 1 << indices[neighbor];
+    if (bitmask & bit) { return; }
+    const remtime = time - dists[valve][neighbor] - 1;
+    if (remtime <= 0) { return; }
+    maxval = Math.max(maxval, dfs(remtime, neighbor, bitmask | bit) +
+      valves[neighbor] * remtime);
+  });
+
+  cache[key] = maxval;
+  return maxval;
+}
+
+function mapOpenValues(buffer)
+{
+  if (mapped) { return; }
+
+  mapped = true;
 
   buffer
     .toString()
@@ -38,10 +69,6 @@ export default async function day16(target)
     });
   debug('valves:', valves);
   debug('tunnels:', tunnels);
-
-
-  const dists = {};
-  const nonempty = [];
 
   Object.keys(valves).forEach(valve =>
   {
@@ -77,38 +104,20 @@ export default async function day16(target)
 
   debug('dists:', dists);
 
-  const indices = {};
   nonempty.forEach((element, index) => indices[element] = index);
   debug('indices:', indices);
+}
 
-  const cache = {};
+function solve1(buffer)
+{
+  mapOpenValues(buffer);
 
-  function dfs(time, valve, bitmask)
-  {
-    const key = `${time}-${valve}-${bitmask}`;
-    if (key in cache) { return cache[key]; }
+  return dfs(30, 'AA', 0);
+}
 
-    let maxval = 0;
-
-    Object.keys(dists[valve]).forEach(neighbor =>
-    {
-      const bit = 1 << indices[neighbor];
-      if (bitmask & bit) { return; }
-      const remtime = time - dists[valve][neighbor] - 1;
-      if (remtime <= 0) { return; }
-      maxval = Math.max(maxval, dfs(remtime, neighbor, bitmask | bit) +
-        valves[neighbor] * remtime);
-    });
-
-    cache[key] = maxval;
-    return maxval;
-  }
-
-  const part1 = dfs(30, 'AA', 0);
-  if (target.includes('example') && part1 !== 1651)
-  {
-    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
-  }
+function solve2(buffer)
+{
+  mapOpenValues(buffer);
 
   const b = (1 << nonempty.length) - 1;
 
@@ -121,7 +130,22 @@ export default async function day16(target)
 
   debug('maximum volume:', m);
 
-  const part2 = m;
+  return m;
+}
+
+export default async function day16(target)
+{
+  const start = Date.now();
+
+  const buffer = await fs.readFile(target);
+
+  const part1 = enabled[1] ? solve1(buffer) : 'todo';
+  if (target.includes('example') && part1 !== 1651)
+  {
+    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
+  }
+
+  const part2 = enabled[2] ? solve2(valves) : 'todo';
   if (target.includes('example') && (part2 !== 'todo' && part2 !== 1707))
   {
     throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 1707`);
