@@ -12,42 +12,16 @@ export function fromSnafu(v)
 
 export function toSnafu(v)
 {
-  const result = [];
   debug('converting', v, 'to SNAFU');
-  const digits = v.toString(5).split('');
-  debug('digits:', digits);
-
-  let carry = false;
-  digits.reverse().forEach(digit =>
+  let total = v;
+  const output = [];
+  while (total !== 0)
   {
-    debug('digit:', digit, 'carry:', carry);
-    switch (digit)
-    {
-      case '0':
-        result.unshift(carry ? 1 : 0);
-        carry = false;
-        break;
-      case '1':
-        result.unshift(carry ? 2 : 1);
-        carry = false;
-        break;
-      case '2':
-        result.unshift(carry ? '=' : 2);
-        break;
-      case '3':
-        result.unshift(carry ? '-' : '=');
-        carry = true;
-        break;
-      case '4':
-        result.unshift(carry ? '0' : '-');
-        carry = true;
-        break;
-      default:
-        result.unshift(digit);
-    }
-  });
-  if (carry) { result.unshift(1); }
-  debug('result:', result.join(''));
-
-  return result.join('');
+    const rem = total % 5;
+    total = Math.floor(total / 5);
+    output.unshift('012=-'.charAt(rem));
+    if (rem > 2) { total++; }
+  }
+  debug('done with loop', 'total:', total, 'output:', output);
+  return output.join('');
 }
