@@ -38,7 +38,7 @@ function dfs(valves, valveId, time, opened)
   const valve = findValve(valves, valveId);
 
   // Open the current valve and add all the volume it can produce
-  const volume = (time - 1) * valve.flow;
+  const volume = valve ? (time - 1) * valve.flow : 0;
   opened[valveId] = true;
 
   db('checking connected valves');
@@ -104,9 +104,42 @@ function solve1(data)
   return dfs(mapOpenValves(data), 'AA', 30, {});
 }
 
-function solve2()
+function solve2(data)
 {
-  return 'todo';
+  const valves = mapOpenValves(data);
+
+  const list = valves.map(v => v.id).filter(v => v !== 'AA');
+  debug('all valves with flow:', list);
+
+  const b = (1 << list.length) - 1;
+  console.log('checking', Math.floor((b + 1) / 2), 'combinations');
+
+  let max = 0;
+
+  for (let i = 1; i < Math.floor((b + 1) / 2); i++)
+  {
+    const targets = {};
+    for (let j = 0; j < list.length; j++)
+    {
+      if (i & 1 << j) { targets[list[j]] = true; }
+    }
+    debug('my targets for', i, targets);
+    const nonTargets = list.filter(v => ! (v in targets))
+      .reduce((a, v) => { a[v] = true; return a; }, {});
+    debug('elephant targets for', i, nonTargets);
+
+    const mine = dfs(valves, 'AA', 26, targets);
+    const el = dfs(valves, 'AA', 26, nonTargets);
+    debug('mine:', mine, 'elephants:', el);
+    if (mine + el > max)
+    {
+      debug('new max:', mine + el);
+      max = mine + el;
+    }
+  }
+
+  debug('max value is:', max);
+  return max;
 }
 
 export default async function day16(target)
@@ -137,9 +170,9 @@ export default async function day16(target)
   }
 
   const part2 = solve2(valves);
-  if (target.includes('example') && part2 !== 'todo')
+  if (target.includes('example') && (part2 !== 'todo' && part2 !== 1707))
   {
-    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 'todo'`);
+    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 1707`);
   }
 
   return { day: 16, part1, part2, duration: Date.now() - start };
