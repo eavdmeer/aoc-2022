@@ -15,25 +15,26 @@ function debug(...args)
 }
 
 const cache = {};
-const cacheKey = (i, t, s) =>
-  `${i}-${t}-${Object.values(s).map(v => v ? 1 : 0).join('')}`;
+const cacheKey = (i, t, s) => `${i}-${t}-${Object.entries(s)
+  .sort(v => v[0])
+  .map(([ k, v ]) => `${k}=${v ? 1 : 0}`)
+  .join(':')}`;
 const cachePut = (k, v) => cache[k] = v;
 const cacheHas = k => k in cache;
 const cacheGet = k => cache[k];
 
+const findValve = (valves, id) => valves.find(v => v.id === id);
+
 function dfs(valves, valveId, time, opened)
 {
+  // Utility functions
   const db = (...args) => debug(time, '-', ...args);
-  const findValve = id => valves.find(v => v.id === id);
-
-  db('-----', 'min', time, '----');
-  db('valve :', valveId);
-  db('opened:', opened);
 
   const key = cacheKey(valveId, time, opened);
-  if (cacheHas(key)) { cacheGet(key); }
+  debug('cache key is', key);
+  if (cacheHas(key)) { return cacheGet(key); }
 
-  const valve = findValve(valveId);
+  const valve = findValve(valves, valveId);
 
   // Open the current valve and add all the volume it can produce
   const volume = (time - 1) * valve.flow;
@@ -67,36 +68,44 @@ function dfs(valves, valveId, time, opened)
   return volume + best;
 }
 
-function solve(valves, start, duration = 30)
+function mapOpenValves(data)
 {
   const graph = new Graph(v => v.id);
 
   // Insert all nodes
-  graph.insert(...valves);
+  graph.insert(...data);
 
   // Insert all edges
-  valves.forEach(v => v.to.forEach(d => graph.connect(v.id, d)));
+  data.forEach(v => v.to.forEach(d => graph.connect(v.id, d)));
 
   // Get all valves with non-zero flow
-  const withFlow = valves
+  const valves = data
     .filter(v => v.id === 'AA' || v.flow > 0)
     .map(v => ({ id: v.id, flow: v.flow }));
 
-  debug('valves with flow', withFlow);
+  debug('valves with flow', valves);
 
   // Add distances using the graph
-  withFlow.forEach(f1 =>
+  valves.forEach(f1 =>
   {
-    f1.dist = withFlow
+    f1.dist = valves
       .filter(v => v !== f1)
       .map(f2 => [ f2.id, graph.findPath(f1.id, f2.id).cost ])
       .reduce((a, [ k, v ]) => { a[k] = v; return a; }, {});
   });
-  debug('valves with distances', withFlow);
+  debug('valves with distances', valves);
 
-  const val = dfs(withFlow, start, duration, {});
+  return valves;
+}
 
-  return val;
+function solve1(data)
+{
+  return dfs(mapOpenValves(data), 'AA', 30, {});
+}
+
+function solve2()
+{
+  return 'todo';
 }
 
 export default async function day16(target)
@@ -120,8 +129,17 @@ export default async function day16(target)
 
   // const part1 = maxflow(valves, valves.find(v => v.id === 'AA'), {}, 30);
 
-  const part1 = solve(valves, 'AA');
-  const part2 = 'todo';
+  const part1 = solve1(valves);
+  if (target.includes('example') && part1 !== 1651)
+  {
+    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 1651`);
+  }
+
+  const part2 = solve2(valves);
+  if (target.includes('example') && part2 !== 'todo')
+  {
+    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 'todo'`);
+  }
 
   return { day: 16, part1, part2, duration: Date.now() - start };
 }
