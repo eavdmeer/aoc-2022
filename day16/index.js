@@ -15,8 +15,9 @@ function debug(...args)
 }
 
 const cache = {};
+
 const cacheKey = (i, t, s) => `${i}-${t}-${Object.entries(s)
-  .sort(v => v[0])
+  .sort()
   .map(([ k, v ]) => `${k}=${v ? 1 : 0}`)
   .join(':')}`;
 const cachePut = (k, v) => cache[k] = v;
