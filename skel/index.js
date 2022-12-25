@@ -28,10 +28,10 @@ export default async function dayxx(target)
   const start = Date.now();
   debug('starting');
 
-  const content = await fs.readFile(target);
+  const buffer = await fs.readFile(target);
 
   /* eslint-disable no-shadow */
-  const data = content
+  const data = buffer
     .toString()
     .trim()
     .split(/\s*\n\s*/)
