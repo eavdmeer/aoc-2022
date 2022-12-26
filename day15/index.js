@@ -65,32 +65,26 @@ function solve2(sensors, maxRange)
   }
   debug('intervals:', intervals);
 
-  const loc = intervals.filter(v =>
-  {
-    if (v.ranges.lenght === 0) { return false; }
-    if (v.ranges.length === 1 &&
-      v.ranges[0][0] <= 0 && v.ranges[0][1] >= maxRange)
+  const loc = intervals
+    .filter(v =>
+      v.ranges.length !== 0 &&
+      v.ranges.length !== 1 &&
+      (v.ranges[0][0] > 0 || v.ranges[0][1] < maxRange)
+    )
+    .reduce((a, v) =>
     {
-      return false;
-    }
-
-    debug('candidate:', v.y, v.ranges);
-    return true;
-  }).reduce((a, v) =>
-  {
-    let x = 0;
-    for (let i = 0; i < v.ranges.length; i++)
-    {
-      const [ min, max ] = v.ranges[i];
-      if (x < min)
+      let x = 0;
+      for (let i = 0; i < v.ranges.length; i++)
       {
-        return { x, y: v.y };
+        const [ min, max ] = v.ranges[i];
+        if (x < min) { return { x, y: v.y }; }
+        if (x > maxRange) { return null; }
+        x = Math.max(x, max) + 1;
       }
-      if (x > maxRange) { return null; }
-      x = Math.max(x, max) + 1;
-    }
-    return null;
-  }, null);
+      return null;
+    }, null);
+
+  if (loc === null) { throw new Error('Unable to find a solution!'); }
 
   debug('found loc:', loc);
 
