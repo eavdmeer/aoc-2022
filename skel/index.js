@@ -1,16 +1,11 @@
 import * as fs from 'fs/promises';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('dayxx');
+
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   dayxx(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function solve1()
