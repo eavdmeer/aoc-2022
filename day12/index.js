@@ -1,17 +1,12 @@
 import * as fs from 'node:fs/promises';
 import PriorityQueue from '../lib/priorityqueue.js';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('day12');
+
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day12(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function neighbors(data, x, y, reverse = false)

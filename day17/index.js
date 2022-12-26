@@ -1,16 +1,11 @@
 import * as fs from 'fs/promises';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('day17');
+
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day17(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 const EMPTY = '.';
@@ -75,7 +70,7 @@ function solve(jets, limit)
     const offset = w * (maxy + 3);
     rock = rock.map(v => v + offset);
     debug('starting new rock');
-    if (doDebug) { draw(rock); }
+    if (makeDebug.enabled('day17')) { draw(rock); }
 
     /* eslint-disable-next-line no-constant-condition */
     while (true)
@@ -95,7 +90,7 @@ function solve(jets, limit)
         default:
       }
       const mid = Array.from(rock);
-      if (doDebug)
+      if (makeDebug.enabled('day17'))
       {
         debug('bump', jets[j], same(before, mid) ? 'does nothing' : 'done');
         draw(rock);
@@ -105,7 +100,7 @@ function solve(jets, limit)
       debug('move down');
       rock = down(rock);
       if (same(mid, rock)) { debug('unable to move down'); }
-      if (doDebug) { draw(rock); }
+      if (makeDebug.enabled('day17')) { draw(rock); }
 
       debug('after:', rock);
 
@@ -120,7 +115,7 @@ function solve(jets, limit)
         board.push(...rock);
         board.sort((a, b) => b - a);
         debug('board', board);
-        if (doDebug) { draw(); }
+        if (makeDebug.enabled('day17')) { draw(); }
         break;
       }
     }
@@ -144,8 +139,6 @@ export default async function day17(target)
   debug('jets:', jets);
 
   const max = 2022;
-
-  if (max > 20) { doDebug = false; }
 
   const part1 = solve(jets, max);
 

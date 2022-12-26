@@ -1,20 +1,15 @@
 import * as fs from 'fs/promises';
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day16');
 
 let mapped = false;
-let doDebug = false;
 const enabled = { 1: true, 2: false };
 
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day16(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 const valves = {};

@@ -1,19 +1,14 @@
 import * as fs from 'fs/promises';
 import linear from 'linear-solve';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day21');
 
 /* eslint-disable no-eval */
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day21(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function method2(data)

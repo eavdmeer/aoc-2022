@@ -1,20 +1,15 @@
 import * as fs from 'fs/promises';
 import { gcd } from '../lib/lcm.js';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day22');
 
 /* eslint max-statements-per-line: ["error", { "max": 4 }] */
 /* eslint-disable no-constant-condition */
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day22(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 const rotate = {
@@ -326,7 +321,6 @@ export default async function day22(target)
   }
 
   // This solution will not work on the example!
-  doDebug = true;
   const part2 = target.includes('a') ? 'todo' :
     solve2(data, instructions);
   if (target.includes('example') && part2 !== 'todo')

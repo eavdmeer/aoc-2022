@@ -1,4 +1,7 @@
 import * as fs from 'fs/promises';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day24');
 
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 // import PriorityQueue from '../lib/priorityqueue.js';
@@ -20,17 +23,9 @@ const dirs = {
 
 const posmod = (v, n) => (v % n + n) % n;
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day24(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 const blizzCache = {};

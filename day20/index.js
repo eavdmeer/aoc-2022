@@ -1,9 +1,10 @@
 import * as fs from 'fs/promises';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('day20');
+
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day20(process.argv[2]).then(console.log);
 }
 
@@ -14,12 +15,6 @@ if (process.argv[2])
  * number off one end of the list wraps back around to the other end as if
  * the ends were connected.
  */
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
-}
 
 function Node(value, len)
 {

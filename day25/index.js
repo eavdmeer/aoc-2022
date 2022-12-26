@@ -1,17 +1,12 @@
 import * as fs from 'fs/promises';
 import { fromSnafu, toSnafu } from './snafu.js';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('day25');
+
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day25(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function solve1(data)

@@ -1,4 +1,7 @@
 import * as fs from 'node:fs/promises';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day14');
 
 /* eslint-disable no-eval */
 
@@ -8,17 +11,9 @@ const SAND = 'o';
 const SOURCE = '+';
 const STONE = '#';
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day14(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function Grid(lines, source, addFloor = false)
@@ -184,7 +179,7 @@ export default async function day14(target)
   let cnt = 0;
   while (g1.dropSand())
   {
-    if (doDebug) { g1.draw(true); }
+    if (makeDebug.enabled('day14')) { g1.draw(true); }
     cnt++;
   }
 
@@ -194,7 +189,7 @@ export default async function day14(target)
   cnt = 0;
   while (g2.dropSand())
   {
-    if (doDebug) { g2.draw(true); }
+    if (makeDebug.enabled('day14')) { g2.draw(true); }
     cnt++;
   }
 

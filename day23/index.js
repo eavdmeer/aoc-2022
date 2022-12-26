@@ -1,4 +1,7 @@
 import * as fs from 'fs/promises';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day23');
 
 const X = 0;
 const Y = 1;
@@ -15,17 +18,9 @@ const compass = {
   NW: [ -1, -1 ]
 };
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day23(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function solve1(data, rounds = 10)

@@ -1,18 +1,13 @@
 import * as fs from 'node:fs/promises';
+import makeDebug from 'debug';
+
+const debug = makeDebug('day13');
 
 /* eslint-disable no-eval */
 
-let doDebug = false;
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day13(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 function compare(left, right)

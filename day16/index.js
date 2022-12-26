@@ -1,19 +1,14 @@
 import * as fs from 'fs/promises';
 import Graph from '../lib/graph.js';
+import makeDebug from 'debug';
 
-let doDebug = false;
+const debug = makeDebug('day16');
+
 const enabled = { 1: true, 2: false };
 
 if (process.argv[2])
 {
-  doDebug = process.argv[2].includes('example');
   day16(process.argv[2]).then(console.log);
-}
-
-function debug(...args)
-{
-  if (! doDebug) { return; }
-  console.log(...args);
 }
 
 const cache = {};
