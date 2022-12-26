@@ -3,11 +3,11 @@ This small repo contains my NodeJS solutions to the Advent of Code challenge of 
 
 # Personal leaderboard
 
-My performance for this year:
+My 'performance' for this year:
 <pre>
       --------Part 1---------   --------Part 2---------
 Day       Time    Rank  Score       Time    Rank  Score
- 25   02:17:47    3876      0          -       -      -
+ 25   02:17:47    3876      0
  24   07:43:31    5318      0   08:11:43    5171      0
  23   07:17:21    6736      0   07:39:18    6633      0
  22   08:41:18    8079      0          -       -      -
@@ -33,3 +33,7 @@ Day       Time    Rank  Score       Time    Rank  Score
   2       >24h  139763      0       >24h  133634      0
   1       >24h  174958      0       >24h  168431      0
 </pre>
+
+> :point_up: There is no part 2 challenge for day 25
+
+> :point_up: Note that the time indicated is from the start of the daily challenge, which is 6:00 AM in my time zone. Unsurprisingly, I very rarely started at that time
