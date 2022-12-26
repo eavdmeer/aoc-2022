@@ -29,7 +29,7 @@ function findIntervals(sensors, yval)
   let [ min, max ] = ranges[0];
   ranges.forEach(([ nextMin, nextMax ]) =>
   {
-    if (nextMin > max)
+    if (nextMin > max + 1)
     {
       // Found unconnected new interval
       reduced.push([ min, max ]);
@@ -56,29 +56,45 @@ function solve1(sensors, yval)
     .reduce((a, v) => a + v, 0);
 }
 
-function solve2(sensors)
+function solve2(sensors, maxRange)
 {
-  /*
-   * line equations of the bounding lines for each sensor
-   *
-   *  Downward
-   *filter  y = -x + sensor.y + sensor.x + sensor.radius
-   *  y = -x + sensor.y + sensor.x - sensor.radius
+  const intervals = [];
+  for (let y = 0; y < maxRange; y++)
+  {
+    intervals.push({ y, ranges: findIntervals(sensors, y) });
+  }
+  debug('intervals:', intervals);
 
-   *  Upward
-   *  y = x + sensor.y - sensor.x + sensor.radius
-   *  y = x + sensor.y - sensor.x - sensor.radius
-   */
-  const down = [
-    ...sensors.map(s => s.y + s.x + s.radius),
-    ...sensors.map(s => s.y + s.x - s.radius) ];
-  debug(down);
+  const loc = intervals.filter(v =>
+  {
+    if (v.ranges.lenght === 0) { return false; }
+    if (v.ranges.length === 1 &&
+      v.ranges[0][0] <= 0 && v.ranges[0][1] >= maxRange)
+    {
+      return false;
+    }
 
-  const up = [
-    ...sensors.map(s => s.y - s.x + s.radius),
-    ...sensors.map(s => s.y - s.x - s.radius) ];
-  debug(up);
-  return 'todo';
+    debug('candidate:', v.y, v.ranges);
+    return true;
+  }).reduce((a, v) =>
+  {
+    let x = 0;
+    for (let i = 0; i < v.ranges.length; i++)
+    {
+      const [ min, max ] = v.ranges[i];
+      if (x < min)
+      {
+        return { x, y: v.y };
+      }
+      if (x > maxRange) { return null; }
+      x = Math.max(x, max) + 1;
+    }
+    return null;
+  }, null);
+
+  debug('found loc:', loc);
+
+  return loc.y + 4000000 * loc.x;
 }
 
 export default async function day15(target)
@@ -112,15 +128,15 @@ export default async function day15(target)
   debug(sensors);
 
   const yval = target.includes('example') ? 10 : 2000000;
-
   const part1 = solve1(sensors, yval);
   if (target.includes('example') && part1 !== 26)
   {
     throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 26`);
   }
 
-  const part2 = solve2(sensors);
-  if (target.includes('example') && part2 !== 'todo')
+  const range = target.includes('example') ? 20 : 4000000;
+  const part2 = solve2(sensors, range);
+  if (target.includes('example') && part2 !== 56000011 && part2 !== 'todo')
   {
     throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 'todo'`);
   }
