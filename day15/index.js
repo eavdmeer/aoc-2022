@@ -8,7 +8,7 @@ if (process.argv[2])
   day15(process.argv[2]).then(console.log);
 }
 
-function solve1(sensors, yval)
+function findIntervals(sensors, yval)
 {
   // x-interval in range for a sensor for a certain y value
   const range = (sensor, y) =>
@@ -16,13 +16,15 @@ function solve1(sensors, yval)
     const dx = sensor.radius - Math.abs(sensor.y - y);
     return dx < 0 ? [] : [ sensor.x - dx, sensor.x + dx ];
   };
+
+  // Map all sensors to their x-range
   const ranges = sensors
     .map(v => range(v, yval))
     .filter(v => v.length)
     .sort((a, b) => a[0] - b[0]);
   debug(ranges);
 
-  // Reduce all overlapping intervals
+  // Reduce any overlapping intervals
   const reduced = [];
   let [ min, max ] = ranges[0];
   ranges.forEach(([ nextMin, nextMax ]) =>
@@ -44,7 +46,12 @@ function solve1(sensors, yval)
   reduced.push([ min, max ]);
   debug('reduced:', reduced);
 
-  return reduced
+  return reduced;
+}
+
+function solve1(sensors, yval)
+{
+  return findIntervals(sensors, yval)
     .map(v => v[1] - v[0])
     .reduce((a, v) => a + v, 0);
 }
