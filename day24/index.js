@@ -4,7 +4,6 @@ import makeDebug from 'debug';
 const debug = makeDebug('day24');
 
 import { MinPriorityQueue } from '@datastructures-js/priority-queue';
-// import PriorityQueue from '../lib/priorityqueue.js';
 import { lcm } from '../lib/lcm.js';
 
 const X = 0;
