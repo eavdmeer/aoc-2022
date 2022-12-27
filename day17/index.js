@@ -61,6 +61,7 @@ function solve(jets, limit)
     rock.map(v => v - w);
 
   let j = 0;
+  const refPos = {};
   for (let i = 0; i < limit; i++)
   {
     // Put a new rock on the board
@@ -109,11 +110,45 @@ function solve(jets, limit)
 
       if (same(rock, mid))
       {
-        // Add to the board
+        // Store reference positions of all rocks on the third time we
+        // place all rocks and compare the current posisitons with that on
+        // every run to detect cycles.
+        const N = 1000;
+        if (i >= N * rocks.length && i < (N + 1) * rocks.length)
+        {
+          refPos[i % rocks.length] = offset - rock[0];
+          refPos.counter = i;
+          refPos.offset = offset;
+          if (i % rocks.length === rocks.length - 1)
+          {
+            console.log('reference:', refPos);
+          }
+        }
+        else if (i >= (N + 1) * rocks.length)
+        {
+          const newPos = {};
+          newPos[i % rocks.length] = offset - rock[0];
+          newPos.counter = i;
+          newPos.offset = offset;
+          if (i % rocks.length === rocks.length - 1)
+          {
+            if (Object.keys(refPos).every(k => refPos[k] === newPos[k]))
+            {
+              console.log('ref', refPos);
+              console.log('new', newPos);
+              console.log('cycle detected!', refPos.counter, newPos.counter);
+              return 'unfinished';
+            }
+          }
+        }
+
+        // Add rock to the board
         debug('placing on the board');
         rock.forEach(v => board.push(v));
         board.push(...rock);
         board.sort((a, b) => b - a);
+
+
         debug('board', board);
         if (makeDebug.enabled('day17')) { draw(); }
         break;
@@ -142,8 +177,9 @@ export default async function day17(target)
 
   const part1 = solve(jets, max);
 
-  // const part2 = solve(jets, 1000000000000);
-  const part2 = 'todo';
+  const part2 = target.includes('example') ? solve(jets, 1000000000000) :
+    'todo';
+  // const part2 = 'todo';
 
   return { day: 17, part1, part2, duration: Date.now() - start };
 }
