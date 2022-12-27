@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import PriorityQueue from '../lib/priorityqueue.js';
+import { MinPriorityQueue } from '@datastructures-js/priority-queue';
 import makeDebug from 'debug';
 
 const debug = makeDebug('day12');
@@ -44,17 +44,17 @@ function solve(data, start, end, reverse = false)
   // - Check if we reached the destination
   // - If not, add all neighbors on the priority queue
   //
-  const heap = new PriorityQueue(v => v.cost);
+  const heap = new MinPriorityQueue(v => v.cost);
   heap.push({ cost: 0, loc: start });
   const visited = {};
 
   while (`${end.x},${end.y}` in visited === false)
   {
-    if (heap.length === 0)
+    if (heap.size() === 0)
     {
       throw new Error('No more open paths! Unable to reach end point!');
     }
-    const { cost, loc } = heap.shift();
+    const { cost, loc } = heap.dequeue();
 
     const key = `${loc.x},${loc.y}`;
     if (key in visited) { continue; }
@@ -122,9 +122,17 @@ export default async function day12(target)
   debug('begin:', begin, 'end:', end);
 
   const part1 = solve(data, begin, end);
+  if (target.includes('example') && part1 !== 31)
+  {
+    throw new Error(`Invalid part 1 solution: ${part1}. Expecting; 31`);
+  }
 
   // Backtrack from the end to the nearest square that's zero
   const part2 = solve(data, end, begin, true);
+  if (target.includes('example') && part2 !== 29)
+  {
+    throw new Error(`Invalid part 2 solution: ${part2}. Expecting; 29`);
+  }
 
   return { day: 12, part1, part2, duration: Date.now() - start };
 }
