@@ -58,37 +58,26 @@ function solve1(sensors, yval)
 
 function solve2(sensors, maxRange)
 {
-  const intervals = [];
   for (let y = 0; y < maxRange; y++)
   {
-    intervals.push({ y, ranges: findIntervals(sensors, y) });
-  }
-  debug('intervals:', intervals);
-
-  const loc = intervals
-    .filter(v =>
-      v.ranges.length !== 0 &&
-      v.ranges.length !== 1 &&
-      (v.ranges[0][0] > 0 || v.ranges[0][1] < maxRange)
-    )
-    .reduce((a, v) =>
+    const ranges = findIntervals(sensors, y);
+    if (ranges.length === 0 ||
+      ranges.length === 1 &&
+      ranges[0][0] < 0 && ranges[0][1] > maxRange)
     {
-      let x = 0;
-      for (let i = 0; i < v.ranges.length; i++)
-      {
-        const [ min, max ] = v.ranges[i];
-        if (x < min) { return { x, y: v.y }; }
-        if (x > maxRange) { return null; }
-        x = Math.max(x, max) + 1;
-      }
-      return null;
-    }, null);
+      continue;
+    }
 
-  if (loc === null) { throw new Error('Unable to find a solution!'); }
-
-  debug('found loc:', loc);
-
-  return loc.y + 4000000 * loc.x;
+    let x = 0;
+    for (let i = 0; i < ranges.length; i++)
+    {
+      const [ min, max ] = ranges[i];
+      if (x < min) { return y + 4000000 * x; }
+      if (x > maxRange) { continue; }
+      x = Math.max(x, max) + 1;
+    }
+  }
+  throw new Error('Unable to find a solution!');
 }
 
 export default async function day15(target)
