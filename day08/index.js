@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day8(process.argv[2]).then(console.log);
+  day08(process.argv[2]).then(console.log);
 }
 
 function viewScore(x, y, grid)
@@ -46,7 +46,7 @@ function visible(x, y, grid)
   );
 }
 
-export default async function day8(target)
+export default async function day08(target)
 {
   const start = Date.now();
 

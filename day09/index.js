@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day9(process.argv[2]).then(console.log);
+  day09(process.argv[2]).then(console.log);
 }
 
 function draw(knots)
@@ -51,7 +51,7 @@ function drag(h, t)
   }
 }
 
-export default async function day9(target)
+export default async function day09(target)
 {
   const debug = target.includes('example');
 

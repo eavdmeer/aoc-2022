@@ -2,10 +2,10 @@ import * as fs from 'node:fs/promises';
 
 if (process.argv[2])
 {
-  day1(process.argv[2]).then(console.log);
+  day01(process.argv[2]).then(console.log);
 }
 
-export default async function day1(target)
+export default async function day01(target)
 {
   const start = Date.now();
 

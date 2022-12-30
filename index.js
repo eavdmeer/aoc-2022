@@ -1,12 +1,12 @@
-import day1 from './day1/index.js';
-import day2 from './day2/index.js';
-import day3 from './day3/index.js';
-import day4 from './day4/index.js';
-import day5 from './day5/index.js';
-import day6 from './day6/index.js';
-import day7 from './day7/index.js';
-import day8 from './day8/index.js';
-import day9 from './day9/index.js';
+import day01 from './day01/index.js';
+import day02 from './day02/index.js';
+import day03 from './day03/index.js';
+import day04 from './day04/index.js';
+import day05 from './day05/index.js';
+import day06 from './day06/index.js';
+import day07 from './day07/index.js';
+import day08 from './day08/index.js';
+import day09 from './day09/index.js';
 import day10 from './day10/index.js';
 import day11 from './day11/index.js';
 import day12 from './day12/index.js';
@@ -28,19 +28,20 @@ async function getResults()
 {
   const report = v =>
   {
-    console.log(`day ${v.day} solved in ${v.duration} ms`);
+    console.log(
+      `day ${String(v.day).padStart(2, 0)} solved in ${v.duration} ms`);
     return v;
   };
   const result = [
-    await day1('day1/data.txt').then(report),
-    await day2('day2/data.txt').then(report),
-    await day3('day3/data.txt').then(report),
-    await day4('day4/data.txt').then(report),
-    await day5('day5/data.txt').then(report),
-    await day6('day6/data.txt').then(report),
-    await day7('day7/data.txt').then(report),
-    await day8('day8/data.txt').then(report),
-    await day9('day9/data.txt').then(report),
+    await day01('day01/data.txt').then(report),
+    await day02('day02/data.txt').then(report),
+    await day03('day03/data.txt').then(report),
+    await day04('day04/data.txt').then(report),
+    await day05('day05/data.txt').then(report),
+    await day06('day06/data.txt').then(report),
+    await day07('day07/data.txt').then(report),
+    await day08('day08/data.txt').then(report),
+    await day09('day09/data.txt').then(report),
     await day10('day10/data.txt').then(report),
     await day11('day11/data.txt').then(report),
     await day12('day12/data.txt').then(report),
